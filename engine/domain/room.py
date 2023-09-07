@@ -1,19 +1,18 @@
-from uuid import UUID
 from domain.player import Player
 
 
 class Room:
-    def __init__(self, id: UUID, players: list[Player]):
+    def __init__(self, id: str, players: list[Player]):
         self.__id = id
         self.__players = players
 
     @property
-    def id(self) -> UUID:
+    def id(self) -> str:
         """
         Getter for id
 
         Returns:
-            UUID: id
+            str: id
         """
         return self.__id
 

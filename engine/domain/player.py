@@ -1,16 +1,13 @@
-from uuid import UUID
-
-
 class Player:
-    def __init__(self, id: UUID):
+    def __init__(self, id: str):
         self.__id = id
 
     @property
-    def id(self) -> UUID:
+    def id(self) -> str:
         """
         Getter for id
 
         Returns:
-            UUID: id
+            str: id
         """
         return self.__id

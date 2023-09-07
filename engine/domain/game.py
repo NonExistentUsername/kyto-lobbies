@@ -1,4 +1,3 @@
-from uuid import UUID
 from dataclasses import dataclass
 
 
@@ -8,17 +7,17 @@ class State:
 
 
 class Game:
-    def __init__(self, id: UUID, state: State):
+    def __init__(self, id: str, state: State):
         self.__id = id
         self.__state = state
 
     @property
-    def id(self) -> UUID:
+    def id(self) -> str:
         """
         Getter for id
 
         Returns:
-            UUID: id
+            str: id
         """
         return self.__id
 
