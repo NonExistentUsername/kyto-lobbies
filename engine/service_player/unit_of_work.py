@@ -28,8 +28,9 @@ class AbstractUnitOfWork(abc.ABC):
             Event: New event
         """
         for instance in self.repository.seen:
-            while instance.events:
-                yield instance.events.pop(0)
+            if hasattr(instance, "events") and isinstance(instance.events, list):
+                while instance.events:
+                    yield instance.events.pop(0)
 
     @abc.abstractmethod
     def _commit(self):
