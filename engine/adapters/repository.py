@@ -1,4 +1,5 @@
 import abc
+
 import domain
 
 
@@ -43,3 +44,32 @@ class AbstractFakeRepository(AbstractRepository):
         raise NotImplementedError
 
 
+class RamRepository(AbstractFakeRepository):
+    def __init__(self, games: dict = None, rooms: dict = None, players: dict = None):
+        super().__init__()
+        self._games = {}
+        self._rooms = {}
+        self._players = {}
+
+    def get_copy(self, id: str) -> "RamRepository":
+        return RamRepository(
+            self._games.copy(), self._rooms.copy(), self._players.copy()
+        )
+
+    def _get_game(self, id: str) -> domain.Game:
+        return self._games.get(id)
+
+    def _get_room(self, id: str) -> domain.Room:
+        return self._rooms.get(id)
+
+    def _get_player(self, id: str) -> domain.Player:
+        return self._players.get(id)
+
+    def add_game(self, game: domain.Game):
+        self._games[game.id] = game
+
+    def add_room(self, room: domain.Room):
+        self._rooms[room.id] = room
+
+    def add_player(self, player: domain.Player):
+        self._players[player.id] = player
