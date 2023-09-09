@@ -3,7 +3,7 @@ from typing import Annotated, Union
 
 from domain.commands import CreatePlayer
 from entrypoints.fastapi_app.deps import get_message_bus
-from entrypoints.fastapi_app.response import Response
+from entrypoints.fastapi_app.responses import Response
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from service_player.messagebus import MessageBus
