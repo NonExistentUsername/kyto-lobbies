@@ -15,9 +15,18 @@ class AbstractUnitOfWork(abc.ABC):
         self.rollback()
 
     def commit(self):
+        """
+        Commit all changes made in this unit of work
+        """
         self._commit()
 
     def collect_new_events(self):
+        """
+        Collect all new events from all instances in the repository
+
+        Yields:
+            Event: New event
+        """
         for instance in self.repository.seen:
             while instance.events:
                 yield instance.events.pop(0)
@@ -28,4 +37,11 @@ class AbstractUnitOfWork(abc.ABC):
 
     @abc.abstractmethod
     def rollback(self):
+        """
+        Rollback all changes made in this unit of work
+
+        Raises:
+            NotImplementedError: Not implemented
+        """
         raise NotImplementedError
+
