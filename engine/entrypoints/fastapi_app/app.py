@@ -1,7 +1,8 @@
-from fastapi import FastAPI, Depends
 from typing import Annotated
-from engine.entrypoints.fastapi_entrypoint.deps import get_current_user
 
+from fastapi import Depends, FastAPI
+
+from engine.entrypoints.fastapi_app.deps import get_current_user
 
 app = FastAPI()
 
@@ -17,4 +18,5 @@ async def root(uuid: Annotated[str, Depends(get_current_user)]) -> dict:
 if __name__ == "__main__":
     import uvicorn
 
+    uvicorn.run(app, host="0.0.0.0", port=8000)
     uvicorn.run(app, host="0.0.0.0", port=8000)

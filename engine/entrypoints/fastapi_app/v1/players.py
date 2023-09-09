@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends
 
-from engine.entrypoints.fastapi_entrypoint.deps import get_current_user
+from engine.entrypoints.fastapi_app.deps import get_current_user
 
 players_router = APIRouter(
     prefix="/players",
