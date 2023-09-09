@@ -8,7 +8,6 @@ def create_app() -> "FastAPI":
     from entrypoints.fastapi_app.routers import main_router
 
     app = FastAPI()
-
     app.include_router(main_router)
 
     return app
