@@ -1,4 +1,7 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
+from fastapi.middleware.cors import CORSMiddleware
+from typing import Annotated
+from engine.entrypoints.fastapi_entrypoint.deps import get_current_user
 
 
 app = FastAPI()
@@ -8,8 +11,8 @@ app = FastAPI()
 
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def root(uuid: Annotated[str, Depends(get_current_user)]) -> dict:
+    return {"message": f"Hello {uuid}"}
 
 
 if __name__ == "__main__":
