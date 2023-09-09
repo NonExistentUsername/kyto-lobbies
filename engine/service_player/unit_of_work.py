@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import abc
 
-from adapters import AbstractRepository
+from adapters import AbstractFakeRepository, AbstractRepository
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -47,11 +47,16 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class RamUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, repository: AbstractRepository):
-        self.repository = repository
+    def __init__(self, repository: AbstractFakeRepository):
+        self.repository: AbstractFakeRepository = repository
+        self.repository_history: list[AbstractFakeRepository] = [self.repository]
 
     def _commit(self):
-        pass
+        self.repository_history.append(self.repository.copy())
 
     def rollback(self):
-        pass
+        if len(self.repository_history) > 1:
+            self.repository = self.repository_history.pop()
+
+        if len(self.repository_history) == 1:
+            self.repository = self.repository_history[0]
