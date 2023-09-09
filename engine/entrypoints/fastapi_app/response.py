@@ -7,5 +7,5 @@ class Response(BaseModel):
     """
 
     message: str
-    status_code: int
+    status_code: int  # Internal status code
     success: bool
