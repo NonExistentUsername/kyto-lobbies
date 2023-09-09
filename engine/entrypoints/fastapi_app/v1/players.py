@@ -13,7 +13,6 @@ logger = logging.getLogger(__name__)
 router = APIRouter(
     prefix="/players",
     tags=["players"],
-    responses={404: {"description": "Not found"}},
 )
 
 
