@@ -4,6 +4,10 @@ version = "0.1.0"
 description = "Engine service"
 authors = ["Dmytro Maior <mayor4090@gmail.com>"]
 readme = "README.md"
+packages = [
+    {include = "*", from = "engine"},
+    {include = "*", from = "tests"},
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
