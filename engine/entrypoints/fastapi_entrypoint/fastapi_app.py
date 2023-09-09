@@ -1,5 +1,4 @@
 from fastapi import FastAPI, Depends
-from fastapi.middleware.cors import CORSMiddleware
 from typing import Annotated
 from engine.entrypoints.fastapi_entrypoint.deps import get_current_user
 
