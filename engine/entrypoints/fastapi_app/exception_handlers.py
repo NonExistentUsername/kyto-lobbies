@@ -11,5 +11,5 @@ def rewrite_404_exception(request: Request, exc: HTTPException) -> JSONResponse:
             message="Not found",
             status_code=404,
             success=False,
-        ),
+        ).model_dump(),
     )
