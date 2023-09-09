@@ -5,11 +5,11 @@ from fastapi import FastAPI
 
 
 def create_app() -> "FastAPI":
-    from entrypoints.fastapi_app.routers import api_v1_router
+    from entrypoints.fastapi_app.routers import main_router
 
     app = FastAPI()
 
-    app.include_router(api_v1_router, prefix="/api/v1")
+    app.include_router(main_router)
 
     return app
 
