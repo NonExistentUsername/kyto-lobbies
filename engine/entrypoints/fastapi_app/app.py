@@ -1,8 +1,7 @@
 from typing import Annotated
 
+from entrypoints.fastapi_app.deps import get_current_user
 from fastapi import Depends, FastAPI
-
-from engine.entrypoints.fastapi_app.deps import get_current_user
 
 app = FastAPI()
 
