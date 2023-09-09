@@ -40,7 +40,7 @@ class AbstractRepository(abc.ABC):
 
 class AbstractFakeRepository(AbstractRepository):
     @abc.abstractmethod
-    def get_copy(self, id: str) -> "AbstractFakeRepository":
+    def copy(self) -> "AbstractFakeRepository":
         raise NotImplementedError
 
 
@@ -51,7 +51,7 @@ class RamRepository(AbstractFakeRepository):
         self._rooms = {}
         self._players = {}
 
-    def get_copy(self, id: str) -> "RamRepository":
+    def copy(self) -> "RamRepository":
         return RamRepository(
             self._games.copy(), self._rooms.copy(), self._players.copy()
         )
