@@ -33,8 +33,7 @@ async def create_player(
         Union[JSONResponse, Response]: Response object
     """
     try:
-        result = message_bus.handle_command(CreatePlayer())
-        print(result)
+        message_bus.handle_command(CreatePlayer())
     except Exception as e:
         logger.exception(e)
         return JSONResponse(
