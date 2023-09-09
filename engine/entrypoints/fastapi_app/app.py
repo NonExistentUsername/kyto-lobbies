@@ -1,20 +1,22 @@
-from typing import Annotated
-
-from entrypoints.fastapi_app.deps import get_current_user
-from fastapi import Depends, FastAPI
-
-app = FastAPI()
+from fastapi import FastAPI
 
 # TODO: For first time, we will recieve uuid of player from client,
 # but later we will use JWT and auth microservice
 
 
-@app.get("/")
-async def root(uuid: Annotated[str, Depends(get_current_user)]) -> dict:
-    return {"message": f"Hello {uuid}"}
+def create_app() -> "FastAPI":
+    from entrypoints.fastapi_app.routers import api_v1_router
+
+    app = FastAPI()
+
+    app.include_router(api_v1_router, prefix="/api/v1")
+
+    return app
 
 
 if __name__ == "__main__":
     import uvicorn
+
+    app = create_app()
 
     uvicorn.run(app, host="0.0.0.0", port=8000)
