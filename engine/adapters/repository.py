@@ -35,3 +35,11 @@ class AbstractRepository(abc.ABC):
     @abc.abstractmethod
     def _get_player(self, id: str) -> domain.Player:
         raise NotImplementedError
+
+
+class AbstractFakeRepository(AbstractRepository):
+    @abc.abstractmethod
+    def get_copy(self, id: str) -> "AbstractFakeRepository":
+        raise NotImplementedError
+
+
