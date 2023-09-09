@@ -20,6 +20,18 @@ router = APIRouter(
 async def create_player(
     message_bus: Annotated[MessageBus, Depends(get_message_bus)]
 ) -> Union[JSONResponse, Response]:
+    """
+    Create player endpoint
+
+    It will create player and return uuid of player
+    It uses message bus to handle command and return response
+
+    Args:
+        message_bus (Annotated[MessageBus, Depends): Message bus
+
+    Returns:
+        Union[JSONResponse, Response]: Response object
+    """
     try:
         result = message_bus.handle_command(CreatePlayer())
         print(result)
