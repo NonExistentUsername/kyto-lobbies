@@ -7,4 +7,4 @@ class Command:
 
 @dataclass
 class CreatePlayer(Command):
-    external_id: str
+    pass
