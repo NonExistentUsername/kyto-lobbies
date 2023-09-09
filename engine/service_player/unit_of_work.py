@@ -45,3 +45,13 @@ class AbstractUnitOfWork(abc.ABC):
         """
         raise NotImplementedError
 
+
+class RamUnitOfWork(AbstractUnitOfWork):
+    def __init__(self, repository: AbstractRepository):
+        self.repository = repository
+
+    def _commit(self):
+        pass
+
+    def rollback(self):
+        pass
