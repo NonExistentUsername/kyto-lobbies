@@ -1,3 +1,3 @@
-from .repository import AbstractFakeRepository, AbstractRepository, RamRepository
+from .repository import AbstractRepository, RamRepository
 
-__all__ = ["AbstractFakeRepository", "AbstractRepository", "RamRepository"]
+__all__ = ["AbstractRepository", "RamRepository"]

@@ -38,13 +38,7 @@ class AbstractRepository(abc.ABC):
         raise NotImplementedError
 
 
-class AbstractFakeRepository(AbstractRepository):
-    @abc.abstractmethod
-    def copy(self) -> "AbstractFakeRepository":
-        raise NotImplementedError
-
-
-class RamRepository(AbstractFakeRepository):
+class RamRepository(AbstractRepository):
     def __init__(self, games: dict = None, rooms: dict = None, players: dict = None):
         super().__init__()
         self._games = {}
