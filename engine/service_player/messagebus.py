@@ -1,7 +1,8 @@
-# pylint: disable=broad-except, attribute-defined-outside-init
 from __future__ import annotations
+
 import logging
-from typing import Callable, Dict, List, Union, Type, TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable, Dict, List, Type, Union
+
 from domain import commands, events
 
 if TYPE_CHECKING:
@@ -30,7 +31,7 @@ class MessageBus:
             if isinstance(message, events.Event):
                 self.handle_event(message)
             elif isinstance(message, commands.Command):
-                self.handle_command(message)
+                return self.handle_command(message)
             else:
                 raise ValueError(f"{message} was not an Event or Command")
 
@@ -48,8 +49,11 @@ class MessageBus:
         logger.debug("handling command %s", command)
         try:
             handler = self.command_handlers[type(command)]
-            handler(command)
-            self.queue.extend(self.uow.collect_new_events())
+            result = handler(command)
+            self.queue.extend(
+                self.uow.collect_new_events()
+            )  # TODO: process this events in a separate loop
+            return result
         except Exception:
             logger.exception("Exception handling command %s", command)
             raise
