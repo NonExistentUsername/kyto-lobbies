@@ -5,6 +5,13 @@ from fastapi import FastAPI
 
 
 def create_app() -> "FastAPI":
+    """
+    Create FastAPI app
+    Application will be created with all routers and exception handlers
+
+    Returns:
+        FastAPI: FastAPI app
+    """
     from entrypoints.fastapi_app.exception_handlers import rewrite_404_exception
     from entrypoints.fastapi_app.v1.routers import router as api_v1_router
 
