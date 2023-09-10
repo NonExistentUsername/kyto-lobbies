@@ -44,7 +44,7 @@ def create_uow(self, type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOf
         unit_of_work.AbstractUnitOfWork: Unit of work
     """
     if type == "ram":
-        return unit_of_work.RamUnitOfWork(self.create_repository("ram"))
+        return unit_of_work.RamUnitOfWork(create_repository("ram"))
 
     elif type == "sql":
         raise NotImplementedError
@@ -54,5 +54,5 @@ def create_uow(self, type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOf
 
 def create_message_bus(self) -> messagebus.MessageBus:
     return messagebus.MessageBus(
-        self.create_uow("ram"),
+        create_uow("ram"),
     )
