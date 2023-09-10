@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from domain import players as players
+from domain import commands, players
 from service_player import unit_of_work
 
 
@@ -17,3 +17,8 @@ def create_player(uow: unit_of_work.AbstractUnitOfWork) -> players.Player:
         uow.commit()
 
     return player
+
+
+COMMAND_HANDLERS = {
+    commands.CreatePlayer: create_player,
+}
