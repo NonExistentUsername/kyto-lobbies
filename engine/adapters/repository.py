@@ -91,6 +91,9 @@ class RamRepository(AbstractPlayerRepository):
         repository.seen = self.seen.copy()
         return repository
 
+    def __len__(self) -> int:  # For testing purposes
+        return len(self._storage_by_id)
+
     def _add(self, instance: _T) -> None:
         self._storage_by_id[instance.id] = instance
         self._storage_by_username[instance.username] = instance
