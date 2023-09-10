@@ -12,10 +12,14 @@ def create_app() -> "FastAPI":
     Returns:
         FastAPI: FastAPI app
     """
+    import logging
+
     from entrypoints.fastapi_app.exception_handlers import rewrite_404_exception
     from entrypoints.fastapi_app.v1.routers import router as api_v1_router
 
-    app = FastAPI()
+    logging.basicConfig(level=logging.DEBUG)
+
+    app = FastAPI(debug=True)
     app.include_router(api_v1_router)
 
     app.add_exception_handler(404, rewrite_404_exception)
