@@ -31,7 +31,7 @@ class MessageBus:
             if isinstance(message, events.Event):
                 self.handle_event(message)
             elif isinstance(message, commands.Command):
-                return self.handle_command(message)
+                self.handle_command(message)
             else:
                 raise ValueError(f"{message} was not an Event or Command")
 
@@ -49,11 +49,8 @@ class MessageBus:
         logger.debug("handling command %s", command)
         try:
             handler = self.command_handlers[type(command)]
-            result = handler(command)
-            self.queue.extend(
-                self.uow.collect_new_events()
-            )  # TODO: process this events in a separate loop
-            return result
+            handler(command)
+            self.queue.extend(self.uow.collect_new_events())
         except Exception:
             logger.exception("Exception handling command %s", command)
             raise
