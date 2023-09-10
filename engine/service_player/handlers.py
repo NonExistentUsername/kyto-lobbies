@@ -4,7 +4,9 @@ from domain import commands, players
 from service_player import unit_of_work
 
 
-def create_player(command: commands.Command, uow: unit_of_work.AbstractUnitOfWork) -> players.Player:
+def create_player(
+    command: commands.Command, uow: unit_of_work.AbstractUnitOfWork
+) -> players.Player:
     """
     Create player
 
