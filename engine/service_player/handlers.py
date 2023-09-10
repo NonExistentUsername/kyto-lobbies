@@ -2,7 +2,7 @@ import logging
 from uuid import uuid4
 
 from domain import commands, events, players
-from service_player import unit_of_work
+from service_player import exceptions, unit_of_work
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +17,11 @@ def create_player(
         player.Player: Player
     """
     with uow:
+        if uow.players.get(username=command.username):
+            raise exceptions.PlayerAlreadyExists(
+                f"Player with username {command.username} already exists"
+            )
+
         player = players.Player(id=str(uuid4()), username=command.username)
         player.events.append(
             events.PlayerCreated(id=player.id, username=player.username)
