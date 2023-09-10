@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 import abc
+from typing import TYPE_CHECKING
 
-from adapters import AbstractRepository, RamRepository
+if TYPE_CHECKING:
+    from adapters import repository
 
 
 class AbstractUnitOfWork(abc.ABC):
-    players: AbstractRepository
+    players: repository.AbstractRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
@@ -48,9 +50,9 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class RamUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, players: RamRepository):
-        self.players: RamRepository = players
-        self.players_history: list[RamRepository] = [self.players]
+    def __init__(self, players: repository.RamRepository):
+        self.players: repository.RamRepository = players
+        self.players_history: list[repository.RamRepository] = [self.players]
 
     def _commit(self):
         self.players_history.append(self.repository.copy())
