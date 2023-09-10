@@ -25,7 +25,7 @@ def create_player(
         player = players.Player(id=str(uuid4()), username=command.username)
         player.events.append(
             events.PlayerCreated(id=player.id, username=player.username)
-        )
+        )  # TODO: Create event collector
         uow.players.add(player)
         uow.commit()
 
