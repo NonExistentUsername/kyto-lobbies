@@ -55,11 +55,11 @@ class RamUnitOfWork(AbstractUnitOfWork):
         self.players_history: list[repository.RamRepository] = [self.players]
 
     def _commit(self):
-        self.players_history.append(self.repository.copy())
+        self.players_history.append(self.players.copy())
 
     def rollback(self):
         if len(self.players_history) > 1:
-            self.repository = self.players_history.pop()
+            self.players = self.players_history.pop()
 
         if len(self.players_history) == 1:
-            self.repository = self.players_history[0]
+            self.players = self.players_history[0]
