@@ -2,6 +2,7 @@ from typing import Literal
 
 import di
 from adapters import repository
+from domain import commands
 from service_player import handlers, messagebus, unit_of_work
 
 
@@ -51,7 +52,10 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
     raise ValueError("Unknown type of unit of work")
 
 
-def create_message_bus(uow: unit_of_work.AbstractUnitOfWork) -> messagebus.MessageBus:
+def create_message_bus(
+    uow: unit_of_work.AbstractUnitOfWork,
+    command_handlers: dict[commands.Command, callable] = handlers.COMMAND_HANDLERS,
+) -> messagebus.MessageBus:
     """
     Create message bus
 
@@ -68,7 +72,7 @@ def create_message_bus(uow: unit_of_work.AbstractUnitOfWork) -> messagebus.Messa
 
     injected_command_handlers = {
         command: di.inject_dependencies(handler, dependencies)
-        for command, handler in handlers.COMMAND_HANDLERS
+        for command, handler in command_handlers.items()
     }
 
     return messagebus.MessageBus(
