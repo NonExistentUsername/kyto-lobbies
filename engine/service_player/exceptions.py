@@ -1,2 +1,6 @@
-class PlayerAlreadyExists(Exception):
+class InternalException(Exception):
+    pass
+
+
+class PlayerAlreadyExists(InternalException):
     pass

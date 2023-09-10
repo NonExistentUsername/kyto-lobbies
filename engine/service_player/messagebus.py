@@ -4,6 +4,7 @@ import logging
 from typing import TYPE_CHECKING, Union
 
 from domain import commands, events
+from service_player import exceptions
 
 if TYPE_CHECKING:
     from . import unit_of_work
@@ -60,6 +61,11 @@ class MessageBus:
                 handler(event)  # Handle event
 
                 self.queue.extend(self.uow.collect_new_events())  # Collect new events
+            except exceptions.InternalException as e:
+                logger.warning(
+                    f"Exception handling event {event}"
+                )  # Do not log stacktrace, because it is expected
+                raise e
             except Exception:
                 logger.exception(f"Exception handling event {event}")
                 continue
@@ -78,6 +84,11 @@ class MessageBus:
             handler(command)  # Handle command
 
             self.queue.extend(self.uow.collect_new_events())  # Collect new events
-        except Exception:
+        except exceptions.InternalException as e:
+            logger.warning(
+                f"Exception handling command {command}"
+            )  # Do not log stacktrace, because it is expected
+            raise e
+        except Exception as e:
             logger.exception(f"Exception handling command {command}")
-            raise
+            raise e

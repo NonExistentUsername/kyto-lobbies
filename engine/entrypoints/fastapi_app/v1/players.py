@@ -36,8 +36,7 @@ async def create_player(
     """
     try:
         message_bus.handle(CreatePlayer(username=username))
-    except exceptions.PlayerAlreadyExists as e:
-        logger.exception(e)
+    except exceptions.PlayerAlreadyExists:
         return JSONResponse(
             content=Response(
                 message="Player already exists",
@@ -50,12 +49,13 @@ async def create_player(
         logger.exception(e)
         return JSONResponse(
             content=Response(
-                message="Error creating player",
+                message="Error during creating player",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 success=False,
             ).model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
     return JSONResponse(
         content=Response(
             message="Player created",
