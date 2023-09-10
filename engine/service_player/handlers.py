@@ -1,7 +1,10 @@
+import logging
 from uuid import uuid4
 
 from domain import commands, events, players
 from service_player import unit_of_work
+
+logger = logging.getLogger(__name__)
 
 
 def create_player(
@@ -24,6 +27,19 @@ def create_player(
     return player
 
 
+def player_created_event_handler(event: events.PlayerCreated) -> None:
+    """
+    Player created event handler
+
+    Args:
+        event (events.PlayerCreated): Player created event
+    """
+    logger.debug(f"Player {event.id} created. Username: {event.username}")
+
+
+EVENT_HANDLERS = {
+    events.PlayerCreated: [player_created_event_handler],
+}
 COMMAND_HANDLERS = {
     commands.CreatePlayer: create_player,
 }
