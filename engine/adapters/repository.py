@@ -1,5 +1,5 @@
 import abc
-from typing import Generic, TypeVar
+from typing import Generic, Optional, TypeVar
 
 _T = TypeVar("_T")
 
@@ -12,7 +12,7 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         self._add(instance)
         self.seen.add(instance)
 
-    def get(self, id: str) -> _T:
+    def get(self, id: str) -> Optional[_T]:
         instance: _T = self._get(id)
         if instance:
             self.seen.add(instance)
@@ -23,7 +23,7 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get(self, id: str) -> _T:
+    def _get(self, id: str) -> Optional[_T]:
         raise NotImplementedError
 
 
@@ -36,5 +36,5 @@ class RamRepository(AbstractRepository):
     def _add(self, instance: _T) -> None:
         self._storage[instance.id] = instance
 
-    def _get(self, id: str) -> _T:
+    def _get(self, id: str) -> Optional[_T]:
         return self._storage.get(id, None)
