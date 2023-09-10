@@ -76,8 +76,10 @@ def create_message_bus(
         for command, handler in command_handlers.items()
     }
     injected_event_handlers = {
-        event: di.inject_dependencies(handler, dependencies)
-        for event, handler in event_handlers.items()
+        event: [
+            di.inject_dependencies(handler, dependencies) for handler in handlers_list
+        ]
+        for event, handlers_list in event_handlers.items()
     }
 
     return messagebus.MessageBus(
