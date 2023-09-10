@@ -6,7 +6,7 @@ from domain.base import BaseModel
 _T = TypeVar("_T", bound=BaseModel)
 
 
-class AbstractRepository(abc.ABC, Generic[_T]):
+class AbstractPlayerRepository(abc.ABC, Generic[_T]):
     def __init__(self):
         self.seen: set[_T] = set()
 
@@ -20,7 +20,9 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         self._add(instance)
         self.seen.add(instance)
 
-    def get(self, id: str) -> Optional[_T]:
+    def get(
+        self, id: Optional[str] = None, username: Optional[str] = None
+    ) -> Optional[_T]:
         """
         Get instance from repository
 
@@ -30,7 +32,7 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         Returns:
             Optional[_T]: Instance or None if not found
         """
-        instance: _T = self._get(id)
+        instance: _T = self._get(id, username)
         if instance:
             self.seen.add(instance)
         return instance
@@ -65,11 +67,16 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
 
-class RamRepository(AbstractRepository):
-    def __init__(self, storage: dict[str, _T] = None):
+class RamRepository(AbstractPlayerRepository):
+    def __init__(
+        self,
+        storage_by_id: dict[str, _T] = None,
+        storage_by_username: dict[str, _T] = None,
+    ):
         super().__init__()
         self.seen: set[_T] = set()
-        self._storage: dict[str, _T] = storage or {}
+        self._storage_by_id: dict[str, _T] = storage_by_id or {}
+        self._storage_by_username: dict[str, _T] = storage_by_username or {}
 
     def copy(self) -> "RamRepository":
         """
@@ -78,13 +85,18 @@ class RamRepository(AbstractRepository):
         Returns:
             RamRepository: Copy of repository
         """
-        storage = self._storage.copy()
-        repository = RamRepository(storage)
+        storage_by_id = self._storage_by_id.copy()
+        storage_by_username = self._storage_by_username.copy()
+        repository = RamRepository(storage_by_id, storage_by_username)
         repository.seen = self.seen.copy()
         return repository
 
     def _add(self, instance: _T) -> None:
         self._storage[instance.id] = instance
 
-    def _get(self, id: str) -> Optional[_T]:
-        return self._storage.get(id, None)
+    def _get(
+        self, id: Optional[str] = None, uuid: Optional[str] = None
+    ) -> Optional[_T]:
+        if id:
+            return self._storage_by_id.get(id)
+        return self._storage_by_username.get(uuid) if uuid else None

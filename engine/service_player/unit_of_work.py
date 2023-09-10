@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractUnitOfWork(abc.ABC):
-    players: repository.AbstractRepository
+    players: repository.AbstractPlayerRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
