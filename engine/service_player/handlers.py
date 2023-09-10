@@ -9,12 +9,13 @@ logger = logging.getLogger(__name__)
 
 def create_player(
     command: commands.CreatePlayer, uow: unit_of_work.AbstractUnitOfWork
-) -> players.Player:
+) -> None:
     """
     Create player
 
-    Returns:
-        player.Player: Player
+    Args:
+        command (commands.CreatePlayer): Create player command
+        uow (unit_of_work.AbstractUnitOfWork): Unit of work
     """
     with uow:
         if uow.players.get(username=command.username):
@@ -28,8 +29,6 @@ def create_player(
         )  # TODO: Create event collector
         uow.players.add(player)
         uow.commit()
-
-    return player
 
 
 def player_created_event_handler(event: events.PlayerCreated) -> None:
