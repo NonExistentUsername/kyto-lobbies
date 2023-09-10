@@ -6,7 +6,7 @@ from adapters import AbstractRepository, RamRepository
 
 
 class AbstractUnitOfWork(abc.ABC):
-    repository: AbstractRepository
+    players: AbstractRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
@@ -27,7 +27,7 @@ class AbstractUnitOfWork(abc.ABC):
         Yields:
             Event: New event
         """
-        for instance in self.repository.seen:
+        for instance in self.players.seen:
             if hasattr(instance, "events") and isinstance(instance.events, list):
                 while instance.events:
                     yield instance.events.pop(0)
@@ -48,16 +48,16 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class RamUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, repository: RamRepository):
-        self.repository: RamRepository = repository
-        self.repository_history: list[RamRepository] = [self.repository]
+    def __init__(self, players: RamRepository):
+        self.players: RamRepository = players
+        self.players_history: list[RamRepository] = [self.players]
 
     def _commit(self):
-        self.repository_history.append(self.repository.copy())
+        self.players_history.append(self.repository.copy())
 
     def rollback(self):
-        if len(self.repository_history) > 1:
-            self.repository = self.repository_history.pop()
+        if len(self.players_history) > 1:
+            self.repository = self.players_history.pop()
 
-        if len(self.repository_history) == 1:
-            self.repository = self.repository_history[0]
+        if len(self.players_history) == 1:
+            self.repository = self.players_history[0]
