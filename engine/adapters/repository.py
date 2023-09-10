@@ -66,10 +66,22 @@ class AbstractRepository(abc.ABC, Generic[_T]):
 
 
 class RamRepository(AbstractRepository):
-    def __init__(self):
+    def __init__(self, storage: dict[str, _T] = None):
         super().__init__()
         self.seen: set[_T] = set()
-        self._storage: dict[str, _T] = {}
+        self._storage: dict[str, _T] = storage or {}
+
+    def copy(self) -> "RamRepository":
+        """
+        Copy repository
+
+        Returns:
+            RamRepository: Copy of repository
+        """
+        storage = self._storage.copy()
+        repository = RamRepository(storage)
+        repository.seen = self.seen.copy()
+        return repository
 
     def _add(self, instance: _T) -> None:
         self._storage[instance.id] = instance
