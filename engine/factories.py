@@ -1,7 +1,8 @@
 from typing import Literal
 
+import di
 from adapters import repository
-from service_player import messagebus, unit_of_work
+from service_player import handlers, messagebus, unit_of_work
 
 
 def create_repository(type: Literal["ram", "sql"]) -> repository.AbstractRepository:
@@ -50,7 +51,28 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
     raise ValueError("Unknown type of unit of work")
 
 
-def create_message_bus() -> messagebus.MessageBus:
+def create_message_bus(uow: unit_of_work.AbstractUnitOfWork) -> messagebus.MessageBus:
+    """
+    Create message bus
+
+    Args:
+        uow (unit_of_work.AbstractUnitOfWork): Unit of work
+
+    Returns:
+        messagebus.MessageBus: Message bus
+    """
+
+    dependencies = {
+        "uow": uow,
+    }
+
+    injected_command_handlers = {
+        command: di.inject_dependencies(handler, dependencies)
+        for command, handler in handlers.COMMAND_HANDLERS
+    }
+
     return messagebus.MessageBus(
-        create_uow("ram"),
+        uow=uow,
+        event_handlers={},
+        command_handlers=injected_command_handlers,
     )
