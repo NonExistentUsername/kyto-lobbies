@@ -1,25 +1,17 @@
 from dataclasses import dataclass
 
+from domain.base import BaseModel
+
 
 @dataclass
 class State:
     pass
 
 
-class Game:
+class Game(BaseModel):
     def __init__(self, id: str, state: State):
-        self.__id = id
+        super().__init__(id)
         self.__state = state
-
-    @property
-    def id(self) -> str:
-        """
-        Getter for id
-
-        Returns:
-            str: id
-        """
-        return self.__id
 
     @property
     def state(self) -> State:

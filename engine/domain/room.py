@@ -1,23 +1,18 @@
-from domain.player import Player
+from typing import TYPE_CHECKING
+
+from domain.base import BaseModel
+
+if TYPE_CHECKING:
+    from domain import player as players
 
 
-class Room:
-    def __init__(self, id: str, players: list[Player]):
-        self.__id = id
+class Room(BaseModel):
+    def __init__(self, id: str, players: list[players.Player]):
+        super().__init__(id)
         self.__players = players
 
     @property
-    def id(self) -> str:
-        """
-        Getter for id
-
-        Returns:
-            str: id
-        """
-        return self.__id
-
-    @property
-    def players(self) -> list[Player]:
+    def players(self) -> list[players.Player]:
         """
         Getter for players
 
