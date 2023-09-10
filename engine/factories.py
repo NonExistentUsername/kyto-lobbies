@@ -50,7 +50,7 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
     raise ValueError("Unknown type of unit of work")
 
 
-def create_message_bus(self) -> messagebus.MessageBus:
+def create_message_bus() -> messagebus.MessageBus:
     return messagebus.MessageBus(
         create_uow("ram"),
     )
