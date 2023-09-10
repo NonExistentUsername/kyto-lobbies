@@ -25,9 +25,20 @@ class MessageBus:
         self.command_handlers = command_handlers
 
     def handle(self, message: Message):
-        self.queue = [message]
+        """
+        Handle message
+
+        Args:
+            message (Message): Message to handle. It can be either Event or Command
+
+        Raises:
+            ValueError: If message is not Event or Command
+        """
+        self.queue: list[Message] = [message]
+
         while self.queue:
-            message = self.queue.pop(0)
+            message: Message = self.queue.pop(0)
+
             if isinstance(message, events.Event):
                 self._handle_event(message)
             elif isinstance(message, commands.Command):
@@ -38,19 +49,23 @@ class MessageBus:
     def _handle_event(self, event: events.Event):
         for handler in self.event_handlers[type(event)]:
             try:
-                logger.debug("handling event %s with handler %s", event, handler)
-                handler(event)
-                self.queue.extend(self.uow.collect_new_events())
+                logger.debug(f"Handling event {event} with handler {handler}")
+
+                handler(event)  # Handle event
+
+                self.queue.extend(self.uow.collect_new_events())  # Collect new events
             except Exception:
-                logger.exception("Exception handling event %s", event)
+                logger.exception(f"Exception handling event {event}")
                 continue
 
     def _handle_command(self, command: commands.Command):
-        logger.debug("handling command %s", command)
+        logger.debug(f"Handling command {command}")
         try:
-            handler = self.command_handlers[type(command)]
-            handler(command)
-            self.queue.extend(self.uow.collect_new_events())
+            handler = self.command_handlers[type(command)]  # Get handler
+
+            handler(command)  # Handle command
+
+            self.queue.extend(self.uow.collect_new_events())  # Collect new events
         except Exception:
-            logger.exception("Exception handling command %s", command)
+            logger.exception(f"Exception handling command {command}")
             raise
