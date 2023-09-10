@@ -5,7 +5,7 @@ from service_player import unit_of_work
 
 
 def create_player(
-    command: commands.Command, uow: unit_of_work.AbstractUnitOfWork
+    command: commands.CreatePlayer, uow: unit_of_work.AbstractUnitOfWork
 ) -> players.Player:
     """
     Create player
@@ -14,7 +14,7 @@ def create_player(
         player.Player: Player
     """
     with uow:
-        player = players.Player(id=str(uuid4()))
+        player = players.Player(id=str(uuid4()), username=command.username)
         uow.players.add(player)
         uow.commit()
 
