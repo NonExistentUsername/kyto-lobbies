@@ -54,6 +54,7 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
 
 def create_message_bus(
     uow: unit_of_work.AbstractUnitOfWork,
+    event_handlers: dict[commands.Command, callable] = handlers.EVENT_HANDLERS,
     command_handlers: dict[commands.Command, callable] = handlers.COMMAND_HANDLERS,
 ) -> messagebus.MessageBus:
     """
@@ -74,9 +75,13 @@ def create_message_bus(
         command: di.inject_dependencies(handler, dependencies)
         for command, handler in command_handlers.items()
     }
+    injected_event_handlers = {
+        event: di.inject_dependencies(handler, dependencies)
+        for event, handler in event_handlers.items()
+    }
 
     return messagebus.MessageBus(
         uow=uow,
-        event_handlers={},
+        event_handlers=injected_event_handlers,
         command_handlers=injected_command_handlers,
     )
