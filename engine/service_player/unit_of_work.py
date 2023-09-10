@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 import abc
+import logging
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from adapters import repository
+
+logger = logging.getLogger(__name__)
 
 
 class AbstractUnitOfWork(abc.ABC):
@@ -55,9 +58,11 @@ class RamUnitOfWork(AbstractUnitOfWork):
         self.players_history: list[repository.RamRepository] = [self.players]
 
     def _commit(self):
+        logger.debug("Commiting changes in RamUnitOfWork")
         self.players_history.append(self.players.copy())
 
     def rollback(self):
+        logger.debug("Rolling back changes in RamUnitOfWork")
         if len(self.players_history) > 1:
             self.players = self.players_history.pop()
 
