@@ -92,7 +92,8 @@ class RamRepository(AbstractPlayerRepository):
         return repository
 
     def _add(self, instance: _T) -> None:
-        self._storage[instance.id] = instance
+        self._storage_by_id[instance.id] = instance
+        self._storage_by_username[instance.username] = instance
 
     def _get(
         self, id: Optional[str] = None, uuid: Optional[str] = None
