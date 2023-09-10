@@ -4,7 +4,7 @@ from adapters import repository
 from service_player import messagebus, unit_of_work
 
 
-def create_repository(type: Literal["ram", "sql"]) -> unit_of_work.AbstractRepository:
+def create_repository(type: Literal["ram", "sql"]) -> repository.AbstractRepository:
     """
     Create repository
 
