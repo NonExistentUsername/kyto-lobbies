@@ -36,14 +36,23 @@ async def create_player(
     """
     try:
         message_bus.handle(CreatePlayer(username=username))
-    except exceptions.PlayerAlreadyExists:
+    except exceptions.PlayerAlreadyExists as e:
         return JSONResponse(
             content=Response(
-                message="Player already exists",
+                message=str(e),
                 status_code=status.HTTP_409_CONFLICT,
                 success=False,
             ).model_dump(),
             status_code=status.HTTP_409_CONFLICT,
+        )
+    except exceptions.InvalidPlayerUsername as e:
+        return JSONResponse(
+            content=Response(
+                message=str(e),
+                status_code=status.HTTP_400_BAD_REQUEST,
+                success=False,
+            ).model_dump(),
+            status_code=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
         logger.exception(e)
