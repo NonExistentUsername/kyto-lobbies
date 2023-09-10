@@ -17,6 +17,9 @@ def create_player(
         command (commands.CreatePlayer): Create player command
         uow (unit_of_work.AbstractUnitOfWork): Unit of work
     """
+    if command.username == "":
+        raise exceptions.InvalidPlayerUsername("Player username cannot be empty")
+
     with uow:
         if uow.players.get(username=command.username):
             raise exceptions.PlayerAlreadyExists(

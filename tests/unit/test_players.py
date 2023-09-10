@@ -26,3 +26,9 @@ class TestPlayerCreation:
         with pytest.raises(exceptions.PlayerAlreadyExists):
             message_bus.handle(commands.CreatePlayer(username="test"))
         assert len(message_bus.uow.players) == 1
+
+    def test_cannot_create_player_with_empty_username(self):
+        message_bus = bootstrap_test_message_bus()
+
+        with pytest.raises(exceptions.InvalidPlayerUsername):
+            message_bus.handle(commands.CreatePlayer(username=""))
