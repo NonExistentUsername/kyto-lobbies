@@ -4,9 +4,7 @@ from adapters import repository
 from service_player import messagebus, unit_of_work
 
 
-def create_repository(
-    self, type: Literal["ram", "sql"]
-) -> unit_of_work.AbstractRepository:
+def create_repository(type: Literal["ram", "sql"]) -> unit_of_work.AbstractRepository:
     """
     Create repository
 
@@ -29,7 +27,7 @@ def create_repository(
     raise ValueError("Unknown type of repository")
 
 
-def create_uow(self, type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
+def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
     """
     Create unit of work
 
