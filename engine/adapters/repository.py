@@ -1,7 +1,9 @@
 import abc
 from typing import Generic, Optional, TypeVar
 
-_T = TypeVar("_T")
+from domain.base import BaseModel
+
+_T = TypeVar("_T", bound=BaseModel)
 
 
 class AbstractRepository(abc.ABC, Generic[_T]):

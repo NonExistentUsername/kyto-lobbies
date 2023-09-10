@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from domain import player as players
+from domain import players as players
 from service_player import unit_of_work
 
 

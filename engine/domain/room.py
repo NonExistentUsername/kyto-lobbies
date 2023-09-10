@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING
 from domain.base import BaseModel
 
 if TYPE_CHECKING:
-    from domain import player as players
+    from domain import players as players
 
 
 class Room(BaseModel):
