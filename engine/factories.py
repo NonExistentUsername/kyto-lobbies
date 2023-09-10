@@ -11,7 +11,7 @@ def create_repository(
     Create repository
 
     Args:
-        type (Literal[&quot;ram&quot;, &quot;sql&quot;]): Type of repository
+        type (Literal["ram", "sql"]): Type of repository
 
     Raises:
         NotImplementedError: If type is not implemented
@@ -34,7 +34,7 @@ def create_uow(self, type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOf
     Create unit of work
 
     Args:
-        type (Literal[&quot;ram&quot;, &quot;sql&quot;]): Type of unit of work
+        type (Literal["ram", "sql"]): Type of unit of work
 
     Raises:
         NotImplementedError: If type is not implemented
