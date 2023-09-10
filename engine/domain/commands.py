@@ -7,4 +7,4 @@ class Command:
 
 @dataclass
 class CreatePlayer(Command):
-    pass
+    username: str

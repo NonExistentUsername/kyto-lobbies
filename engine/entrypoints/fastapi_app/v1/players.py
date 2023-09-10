@@ -18,7 +18,7 @@ router = APIRouter(
 
 @router.post("/", response_model=Response, status_code=status.HTTP_201_CREATED)
 async def create_player(
-    message_bus: Annotated[MessageBus, Depends(get_message_bus)]
+    username: str, message_bus: Annotated[MessageBus, Depends(get_message_bus)]
 ) -> Union[JSONResponse, Response]:
     """
     Create player endpoint
@@ -27,13 +27,14 @@ async def create_player(
     It uses message bus to handle command and return response
 
     Args:
+        username (str): Username of player
         message_bus (Annotated[MessageBus, Depends): Message bus
 
     Returns:
         Union[JSONResponse, Response]: Response object
     """
     try:
-        message_bus.handle_command(CreatePlayer())
+        message_bus.handle_command(CreatePlayer(username=username))
     except Exception as e:
         logger.exception(e)
         return JSONResponse(
