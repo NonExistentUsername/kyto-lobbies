@@ -43,7 +43,10 @@ def player_created_event_handler(event: events.PlayerCreated) -> None:
     Args:
         event (events.PlayerCreated): Player created event
     """
-    logger.debug(f"Player {event.id} created. Username: {event.username}")
+    logger.debug(
+        f"Player {event.player.id} created. Username: {event.player.username}. \
+Event id: {event.id}"
+    )
 
 
 def create_room(
