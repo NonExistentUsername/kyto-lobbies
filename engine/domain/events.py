@@ -1,17 +1,19 @@
 from dataclasses import dataclass
+from uuid import uuid4
+
+from domain import players, rooms
 
 
 class Event:
-    pass
+    def __init__(self):
+        self.id: str = str(uuid4())  # unique id of event
 
 
 @dataclass
 class PlayerCreated(Event):
-    id: str
-    username: str
+    player: players.Player
 
 
 @dataclass
 class RoomCreated(Event):
-    id: str
-    creator_id: str
+    room: rooms.Room

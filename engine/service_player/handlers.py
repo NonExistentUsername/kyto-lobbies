@@ -28,7 +28,7 @@ def create_player(
 
         player = players.Player(id=str(uuid4()), username=command.username)
         player.events.append(
-            events.PlayerCreated(id=player.id, username=player.username)
+            events.PlayerCreated(player=player)
         )  # TODO: Create event collector
         uow.players.add(player)
         uow.commit()
@@ -67,7 +67,7 @@ def create_room(
             )
 
         room = rooms.Room(id=str(uuid4()), creator_id=command.creator_id)
-        room.events.append(events.RoomCreated(id=room.id, creator_id=room.creator_id))
+        room.events.append(events.RoomCreated(room=room))
         uow.rooms.add(room)
         uow.commit()
 
