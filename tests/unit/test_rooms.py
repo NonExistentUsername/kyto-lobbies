@@ -1,6 +1,6 @@
 import factories
 import pytest
-from domain import commands, players
+from domain import commands, players, rooms
 from service_player import exceptions, messagebus
 
 
@@ -18,7 +18,13 @@ class TestRoomCreation:
         message_bus.handle(commands.CreatePlayer(username="test"))
         player: players.Player = message_bus.uow.players.get(username="test")
 
-        message_bus.handle(commands.CreateRoom(creator_id=player.id))
+        command_result: commands.CommandResult = message_bus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        assert command_result is not None
+        assert command_result.result is not None
+        assert isinstance(command_result.result, rooms.Room)
+
         assert len(message_bus.uow.rooms) == 1
         assert message_bus.uow.rooms.get(creator_id=player.id) is not None
 

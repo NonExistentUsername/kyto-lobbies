@@ -48,7 +48,7 @@ def player_created_event_handler(event: events.PlayerCreated) -> None:
 
 def create_room(
     command: commands.CreateRoom, uow: unit_of_work.AbstractUnitOfWork
-) -> None:
+) -> rooms.Room:
     """
     Create room
 
@@ -72,6 +72,8 @@ def create_room(
         room.events.append(events.RoomCreated(room=room))
         uow.rooms.add(room)
         uow.commit()
+
+        return room
 
 
 EVENT_HANDLERS = {
