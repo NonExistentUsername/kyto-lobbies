@@ -1,14 +1,12 @@
-from typing import TYPE_CHECKING, Optional
+from typing import List, Optional
 
+from domain import players as players
 from domain.base import BaseModel
-
-if TYPE_CHECKING:
-    from domain import players as players
 
 
 class Room(BaseModel):
     def __init__(
-        self, id: str, creator_id: str, players: Optional[list[players.Player]] = None
+        self, id: str, creator_id: str, players: Optional[List[players.Player]] = None
     ):
         super().__init__(id)
         self.__creator_id = creator_id

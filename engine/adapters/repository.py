@@ -3,12 +3,13 @@ from __future__ import annotations
 import abc
 from typing import Generic, Optional, TypeVar
 
+from domain import players
 from domain.base import BaseModel
 
 _T = TypeVar("_T", bound=BaseModel)
 
 
-class AbstractPlayerRepository(abc.ABC, Generic[_T]):
+class AbstractRepository(abc.ABC, Generic[_T]):
     def __init__(self):
         self.seen: set[_T] = set()
 
@@ -22,21 +23,21 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
         self._add(instance)
         self.seen.add(instance)
 
-    def get(
-        self, id: Optional[str] = None, username: Optional[str] = None
-    ) -> Optional[_T]:
+    def get(self, **kwargs) -> Optional[_T]:
         """
-        Get instance from repository
+        Get instance from repository by keyword arguments
 
-        Args:
-            id (str): ID of instance
+        Raises:
+            NotImplementedError: Not implemented
 
         Returns:
             Optional[_T]: Instance or None if not found
         """
-        instance: Optional[_T] = self._get(id, username)
+        instance: Optional[_T] = self._get(**kwargs)
+
         if instance:
             self.seen.add(instance)
+
         return instance
 
     @abc.abstractmethod
@@ -53,35 +54,28 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get(
-        self, id: Optional[str] = None, username: Optional[str] = None
-    ) -> Optional[_T]:
+    def _get(self, **kwargs) -> Optional[_T]:
         """
-        Get instance from repository
-
-        Args:
-            id (Optional[str], optional): ID of instance. Defaults to None.
-            username (Optional[str], optional): Username of instance. Defaults to None.
+        Get instance from repository by keyword arguments
 
         Raises:
-            NotImplementedError: _description_
+            NotImplementedError: Not implemented
 
         Returns:
-            Optional[_T]: _description_
+            Optional[_T]: Instance or None if not found
         """
         raise NotImplementedError
 
 
-class RamPlayerRepository(AbstractPlayerRepository):
+class RamPlayerRepository(AbstractRepository[players.Player]):
     def __init__(
         self,
-        storage_by_id: Optional[dict[str, _T]] = None,
-        storage_by_username: Optional[dict[str, _T]] = None,
+        storage_by_id: Optional[dict[str, players.Player]] = None,
+        storage_by_username: Optional[dict[str, players.Player]] = None,
     ):
         super().__init__()
-        self.seen: set[_T] = set()
-        self._storage_by_id: dict[str, _T] = storage_by_id or {}
-        self._storage_by_username: dict[str, _T] = storage_by_username or {}
+        self._storage_by_id: dict[str, players.Player] = storage_by_id or {}
+        self._storage_by_username: dict[str, players.Player] = storage_by_username or {}
 
     def copy(self) -> RamPlayerRepository:
         """
@@ -99,13 +93,13 @@ class RamPlayerRepository(AbstractPlayerRepository):
     def __len__(self) -> int:  # For testing purposes
         return len(self._storage_by_id)
 
-    def _add(self, instance: _T) -> None:
+    def _add(self, instance: players.Player) -> None:
         self._storage_by_id[instance.id] = instance
         self._storage_by_username[instance.username] = instance
 
-    def _get(
-        self, id: Optional[str] = None, uuid: Optional[str] = None
-    ) -> Optional[_T]:
-        if id:
+    def _get(self, **kwargs) -> Optional[players.Player]:
+        if id := kwargs.get("id", None):
             return self._storage_by_id.get(id, None)
-        return self._storage_by_username.get(uuid, None) if uuid else None
+
+        username: Optional[str] = kwargs.get("username", None)
+        return self._storage_by_username.get(username, None) if username else None

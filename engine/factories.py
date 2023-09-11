@@ -6,9 +6,7 @@ from domain import commands, events
 from service_player import handlers, messagebus, unit_of_work
 
 
-def create_repository(
-    type: Literal["ram", "sql"]
-) -> repository.AbstractPlayerRepository:
+def create_repository(type: Literal["ram", "sql"]) -> repository.AbstractRepository:
     """
     Create repository
 
