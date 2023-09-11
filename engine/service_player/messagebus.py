@@ -67,7 +67,7 @@ class MessageBus:
 
                 self.queue.extend(self.uow.collect_new_events())  # Collect new events
             except exceptions.InternalException as e:
-                logger.warning(
+                logger.info(
                     f"Exception handling event {event}"
                 )  # Do not log stacktrace, because it is expected
                 raise e
@@ -83,6 +83,7 @@ class MessageBus:
             command (commands.Command): Command to handle
         """
         logger.debug(f"Handling command {command}")
+
         try:
             handler = self.command_handlers[type(command)]  # Get handler
 
@@ -92,7 +93,7 @@ class MessageBus:
 
             return result  # Return command execution result
         except exceptions.InternalException as e:
-            logger.warning(
+            logger.info(
                 f"Exception handling command {command}"
             )  # Do not log stacktrace, because it is expected
             raise e
