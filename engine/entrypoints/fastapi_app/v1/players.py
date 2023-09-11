@@ -24,7 +24,7 @@ async def create_player(
     """
     Create player endpoint
 
-    It will create player and return uuid of player
+    It will create player with username
     It uses message bus to handle command and return response
 
     Args:
