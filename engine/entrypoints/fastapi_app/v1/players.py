@@ -1,7 +1,7 @@
 import logging
 from typing import Annotated, Union
 
-from domain.commands import CreatePlayer
+from domain import commands, players
 from entrypoints.fastapi_app.deps import get_message_bus
 from entrypoints.fastapi_app.responses import Response
 from fastapi import APIRouter, Depends, status
@@ -35,7 +35,23 @@ async def create_player(
         Union[JSONResponse, Response]: Response object
     """
     try:
-        message_bus.handle(CreatePlayer(username=username))
+        command_result: commands.CommandResult = message_bus.handle(
+            commands.CreatePlayer(username=username)
+        )
+        player: players.Player = command_result.result
+
+        return JSONResponse(
+            content=Response(
+                message="Player created",
+                data={
+                    "id": player.id,
+                    "username": player.username,
+                },
+                status_code=status.HTTP_201_CREATED,
+                success=True,
+            ).model_dump(),
+            status_code=status.HTTP_201_CREATED,
+        )
     except exceptions.PlayerAlreadyExists as e:
         return JSONResponse(
             content=Response(
@@ -64,12 +80,3 @@ async def create_player(
             ).model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
-
-    return JSONResponse(
-        content=Response(
-            message="Player created",
-            status_code=status.HTTP_201_CREATED,
-            success=True,
-        ).model_dump(),
-        status_code=status.HTTP_201_CREATED,
-    )
