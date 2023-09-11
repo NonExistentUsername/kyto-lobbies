@@ -32,7 +32,7 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
         Returns:
             Optional[_T]: Instance or None if not found
         """
-        instance: _T = self._get(id, username)
+        instance: Optional[_T] = self._get(id, username)
         if instance:
             self.seen.add(instance)
         return instance
@@ -51,18 +51,21 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def _get(self, id: str) -> Optional[_T]:
+    def _get(
+        self, id: Optional[str] = None, username: Optional[str] = None
+    ) -> Optional[_T]:
         """
         Get instance from repository
 
         Args:
-            id (str): ID of instance
+            id (Optional[str], optional): ID of instance. Defaults to None.
+            username (Optional[str], optional): Username of instance. Defaults to None.
 
         Raises:
-            NotImplementedError: Not implemented
+            NotImplementedError: _description_
 
         Returns:
-            Optional[_T]: Instance or None if not found
+            Optional[_T]: _description_
         """
         raise NotImplementedError
 
@@ -70,8 +73,8 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
 class RamRepository(AbstractPlayerRepository):
     def __init__(
         self,
-        storage_by_id: dict[str, _T] = None,
-        storage_by_username: dict[str, _T] = None,
+        storage_by_id: Optional[dict[str, _T]] = None,
+        storage_by_username: Optional[dict[str, _T]] = None,
     ):
         super().__init__()
         self.seen: set[_T] = set()
@@ -102,5 +105,5 @@ class RamRepository(AbstractPlayerRepository):
         self, id: Optional[str] = None, uuid: Optional[str] = None
     ) -> Optional[_T]:
         if id:
-            return self._storage_by_id.get(id)
-        return self._storage_by_username.get(uuid) if uuid else None
+            return self._storage_by_id.get(id, None)
+        return self._storage_by_username.get(uuid, None) if uuid else None
