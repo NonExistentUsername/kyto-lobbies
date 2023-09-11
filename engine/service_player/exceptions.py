@@ -6,5 +6,9 @@ class PlayerAlreadyExists(InternalException):
     pass
 
 
+class PlayerDoesNotExist(InternalException):
+    pass
+
+
 class InvalidPlayerUsername(InternalException):
     pass
