@@ -6,9 +6,11 @@ from domain import commands, events
 from service_player import handlers, messagebus, unit_of_work
 
 
-def create_repository(type: Literal["ram", "sql"]) -> repository.AbstractRepository:
+def create_players_repository(
+    type: Literal["ram", "sql"]
+) -> repository.AbstractRepository:
     """
-    Create repository
+    Create players repository
 
     Args:
         type (Literal["ram", "sql"]): Type of repository
@@ -18,10 +20,31 @@ def create_repository(type: Literal["ram", "sql"]) -> repository.AbstractReposit
         ValueError: If type is unknown
 
     Returns:
-        unit_of_work.AbstractRepository: Repository
+        unit_of_work.AbstractRepository: Players repository
     """
     if type == "ram":
         return repository.RamPlayerRepository()
+
+    elif type == "sql":
+        raise NotImplementedError
+
+    raise ValueError("Unknown type of repository")
+
+
+def create_rooms_repository(
+    type: Literal["ram", "sql"]
+) -> repository.AbstractRepository:
+    """
+    Create rooms repository
+
+    Args:
+        type (Literal["ram", "sql"]): Type of repository
+
+    Returns:
+        repository.AbstractRepository: Rooms repository
+    """
+    if type == "ram":
+        return repository.RamRoomRepository()
 
     elif type == "sql":
         raise NotImplementedError
@@ -44,7 +67,9 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
         unit_of_work.AbstractUnitOfWork: Unit of work
     """
     if type == "ram":
-        return unit_of_work.RamUnitOfWork(create_repository("ram"))
+        return unit_of_work.RamUnitOfWork(
+            create_players_repository("ram"), create_rooms_repository("ram")
+        )
 
     elif type == "sql":
         raise NotImplementedError

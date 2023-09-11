@@ -11,7 +11,8 @@ logger = logging.getLogger(__name__)
 
 
 class AbstractUnitOfWork(abc.ABC):
-    players: repository.AbstractPlayerRepository
+    players: repository.AbstractRepository
+    rooms: repository.AbstractRepository
 
     def __enter__(self) -> AbstractUnitOfWork:
         return self
@@ -53,18 +54,29 @@ class AbstractUnitOfWork(abc.ABC):
 
 
 class RamUnitOfWork(AbstractUnitOfWork):
-    def __init__(self, players: repository.RamRepository):
-        self.players: repository.RamRepository = players
-        self.players_history: list[repository.RamRepository] = [self.players]
+    def __init__(
+        self,
+        players: repository.RamPlayerRepository,
+        rooms: repository.RamRoomRepository,
+    ):
+        self.players: repository.RamPlayerRepository = players
+        self.rooms: repository.RamRoomRepository = rooms
+
+        self.players_history: list[repository.RamPlayerRepository] = [self.players]
+        self.rooms_history: list[repository.RamRoomRepository] = [self.rooms]
 
     def _commit(self):
         logger.debug("Commiting changes in RamUnitOfWork")
+
         self.players_history.append(self.players.copy())
+        self.rooms_history.append(self.rooms.copy())
 
     def rollback(self):
         logger.debug("Rolling back changes in RamUnitOfWork")
         if len(self.players_history) > 1:
             self.players = self.players_history.pop()
+            self.rooms = self.rooms_history.pop()
 
         if len(self.players_history) == 1:
             self.players = self.players_history[0]
+            self.rooms = self.rooms_history[0]
