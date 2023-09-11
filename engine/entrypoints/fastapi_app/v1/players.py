@@ -25,7 +25,6 @@ async def create_player(
     Create player endpoint
 
     It will create player with username
-    It uses message bus to handle command and return response
     """
     try:
         command_result: commands.CommandResult = message_bus.handle(
