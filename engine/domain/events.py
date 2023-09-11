@@ -17,7 +17,15 @@ class Event:
 class PlayerCreated(Event):
     player: players.Player
 
+    def __init__(self, player: players.Player):
+        super().__init__()
+        self.player = player
+
 
 @dataclass
 class RoomCreated(Event):
     room: rooms.Room
+
+    def __init__(self, room: rooms.Room):
+        super().__init__()
+        self.room = room

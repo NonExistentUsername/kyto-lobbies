@@ -35,7 +35,15 @@ class CommandResult:
 class CreatePlayer(Command):
     username: str
 
+    def __init__(self, username: str = ""):
+        super().__init__()
+        self.username = username
+
 
 @dataclass
 class CreateRoom(Command):
     creator_id: str  # id of player who created the room
+
+    def __init__(self, creator_id: str):
+        super().__init__()
+        self.creator_id = creator_id
