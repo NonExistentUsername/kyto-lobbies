@@ -1,7 +1,8 @@
 from __future__ import annotations
 
 import abc
-from typing import Generic, Optional, TypeVar
+from copy import deepcopy
+from typing import Generic, List, Optional, TypeVar
 
 from domain import players
 from domain.base import BaseModel
@@ -67,39 +68,54 @@ class AbstractRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
 
-class RamPlayerRepository(AbstractRepository[players.Player]):
+class RamRepository(AbstractRepository[_T]):
     def __init__(
         self,
-        storage_by_id: Optional[dict[str, players.Player]] = None,
-        storage_by_username: Optional[dict[str, players.Player]] = None,
+        fields: Optional[List[str]] = None,
+        storages: Optional[dict[str, dict[str, _T]]] = None,
     ):
         super().__init__()
-        self._storage_by_id: dict[str, players.Player] = storage_by_id or {}
-        self._storage_by_username: dict[str, players.Player] = storage_by_username or {}
+        self._fields: List[str] = fields or []
+        self._storages: dict[str, dict[str, _T]] = storages or {}
 
-    def copy(self) -> RamPlayerRepository:
+        for field in self._fields:
+            if field not in self._storages:
+                self._storages[field] = {}
+
+    def copy(self) -> RamRepository[_T]:
         """
         Copy repository
 
         Returns:
             RamRepository: Copy of repository
         """
-        storage_by_id = self._storage_by_id.copy()
-        storage_by_username = self._storage_by_username.copy()
-        repository = RamPlayerRepository(storage_by_id, storage_by_username)
+        fields = self._fields.copy()
+        storages = deepcopy(self._storages)
+        repository = RamRepository(fields, storages)
         repository.seen = self.seen.copy()
         return repository
 
     def __len__(self) -> int:  # For testing purposes
-        return len(self._storage_by_id)
+        return len(self._storages[self._fields[0]])
 
-    def _add(self, instance: players.Player) -> None:
-        self._storage_by_id[instance.id] = instance
-        self._storage_by_username[instance.username] = instance
+    def _add(self, instance: _T) -> None:
+        for field in self._fields:
+            value = getattr(instance, field)
+            self._storages[field][value] = instance
 
     def _get(self, **kwargs) -> Optional[players.Player]:
-        if id := kwargs.get("id", None):
-            return self._storage_by_id.get(id, None)
+        for field in self._fields:
+            if value := kwargs.get(field, None):
+                return self._storages[field].get(value, None)
 
-        username: Optional[str] = kwargs.get("username", None)
-        return self._storage_by_username.get(username, None) if username else None
+        return None
+
+
+class RamPlayerRepository(RamRepository[players.Player]):
+    def __init__(
+        self,
+        fields: Optional[List[str]] = None,
+        storages: Optional[dict[str, dict[str, players.Player]]] = None,
+    ):
+        fields = fields or ["id", "username"]
+        super().__init__(fields, storages)
