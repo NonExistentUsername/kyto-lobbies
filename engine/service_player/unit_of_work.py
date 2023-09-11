@@ -38,6 +38,11 @@ class AbstractUnitOfWork(abc.ABC):
                 while instance.events:
                     yield instance.events.pop(0)
 
+        for instance in self.rooms.seen:
+            if hasattr(instance, "events") and isinstance(instance.events, list):
+                while instance.events:
+                    yield instance.events.pop(0)
+
     @abc.abstractmethod
     def _commit(self):
         raise NotImplementedError
@@ -62,21 +67,17 @@ class RamUnitOfWork(AbstractUnitOfWork):
         self.players: repository.RamPlayerRepository = players
         self.rooms: repository.RamRoomRepository = rooms
 
-        self.players_history: list[repository.RamPlayerRepository] = [self.players]
-        self.rooms_history: list[repository.RamRoomRepository] = [self.rooms]
+        self.last_committed_players = self.players.copy()
+        self.last_committed_rooms = self.rooms.copy()
 
     def _commit(self):
         logger.debug("Commiting changes in RamUnitOfWork")
 
-        self.players_history.append(self.players.copy())
-        self.rooms_history.append(self.rooms.copy())
+        self.last_committed_players = self.players.copy()
+        self.last_committed_rooms = self.rooms.copy()
 
     def rollback(self):
         logger.debug("Rolling back changes in RamUnitOfWork")
-        if len(self.players_history) > 1:
-            self.players = self.players_history.pop()
-            self.rooms = self.rooms_history.pop()
 
-        if len(self.players_history) == 1:
-            self.players = self.players_history[0]
-            self.rooms = self.rooms_history[0]
+        self.players = self.last_committed_players.copy()
+        self.rooms = self.last_committed_rooms.copy()
