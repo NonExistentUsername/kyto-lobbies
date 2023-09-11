@@ -1,7 +1,7 @@
 import logging
 from uuid import uuid4
 
-from domain import commands, events, players
+from domain import commands, events, players, rooms
 from service_player import exceptions, unit_of_work
 
 logger = logging.getLogger(__name__)
@@ -44,9 +44,39 @@ def player_created_event_handler(event: events.PlayerCreated) -> None:
     logger.debug(f"Player {event.id} created. Username: {event.username}")
 
 
+def create_room(
+    command: commands.CreateRoom, uow: unit_of_work.AbstractUnitOfWork
+) -> None:
+    """
+    Create room
+
+    Args:
+        command (commands.CreateRoom): Create room command
+        uow (unit_of_work.AbstractUnitOfWork): Unit of work
+    """
+    with uow:
+        player: players.Player = uow.players.get(id=command.creator_id)
+        if not player:
+            raise exceptions.PlayerDoesNotExist(
+                f"Player with id {command.creator_id} does not exist"
+            )
+
+        if uow.rooms.get(creator_id=command.creator_id):
+            raise exceptions.RoomAlreadyExists(
+                f"Room with creator id {command.creator_id} already exists"
+            )
+
+        room = rooms.Room(id=str(uuid4()), creator_id=command.creator_id)
+        room.events.append(events.RoomCreated(id=room.id, creator_id=room.creator_id))
+        uow.rooms.add(room)
+        uow.commit()
+
+
 EVENT_HANDLERS = {
     events.PlayerCreated: [player_created_event_handler],
+    events.RoomCreated: [],
 }
 COMMAND_HANDLERS = {
     commands.CreatePlayer: create_player,
+    commands.CreateRoom: create_room,
 }

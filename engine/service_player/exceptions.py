@@ -12,3 +12,7 @@ class PlayerDoesNotExist(InternalException):
 
 class InvalidPlayerUsername(InternalException):
     pass
+
+
+class RoomAlreadyExists(InternalException):
+    pass
