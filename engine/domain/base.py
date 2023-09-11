@@ -1,6 +1,13 @@
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from domain.events import Event
+
+
 class BaseModel:
     def __init__(self, id: str):
         self.__id = id
+        self.events: list[Event] = []
 
     @property
     def id(self) -> str:
