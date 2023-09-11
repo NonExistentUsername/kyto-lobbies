@@ -54,11 +54,14 @@ class FutureResult:
 
         return handler
 
-    def await_result(self) -> Any:
+    def await_result(self) -> MessageResult:
         while not self.is_set:
             import time
 
             time.sleep(0.01)  # TODO: Replace with asyncio.sleep
+
+        if isinstance(self.result, Exception):
+            raise self.result
 
         return self.result
 

@@ -27,9 +27,14 @@ async def create_room(
     It will create room with creator as player with player_id
     """
     try:
-        command_result: commands.CommandResult = message_bus.handle(
+        future_result: messagebus.FutureResult = message_bus.handle(
             commands.CreateRoom(creator_id=player_id)
         )
+        command_result: commands.CommandResult = future_result.await_result()
+
+        if isinstance(command_result.result, Exception):
+            raise command_result.result
+
         room: rooms.Room = command_result.result
 
         return JSONResponse(

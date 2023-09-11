@@ -27,9 +27,14 @@ async def create_player(
     It will create player with username
     """
     try:
-        command_result: commands.CommandResult = message_bus.handle(
+        future_result: messagebus.FutureResult = message_bus.handle(
             commands.CreatePlayer(username=username)
         )
+        command_result: commands.CommandResult = future_result.await_result()
+
+        if isinstance(command_result.result, Exception):
+            raise command_result.result
+
         player: players.Player = command_result.result
 
         return JSONResponse(
