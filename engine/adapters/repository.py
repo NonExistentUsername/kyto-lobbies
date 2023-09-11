@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import abc
 from typing import Generic, Optional, TypeVar
 
@@ -70,7 +72,7 @@ class AbstractPlayerRepository(abc.ABC, Generic[_T]):
         raise NotImplementedError
 
 
-class RamRepository(AbstractPlayerRepository):
+class RamPlayerRepository(AbstractPlayerRepository):
     def __init__(
         self,
         storage_by_id: Optional[dict[str, _T]] = None,
@@ -81,7 +83,7 @@ class RamRepository(AbstractPlayerRepository):
         self._storage_by_id: dict[str, _T] = storage_by_id or {}
         self._storage_by_username: dict[str, _T] = storage_by_username or {}
 
-    def copy(self) -> "RamRepository":
+    def copy(self) -> RamPlayerRepository:
         """
         Copy repository
 
@@ -90,7 +92,7 @@ class RamRepository(AbstractPlayerRepository):
         """
         storage_by_id = self._storage_by_id.copy()
         storage_by_username = self._storage_by_username.copy()
-        repository = RamRepository(storage_by_id, storage_by_username)
+        repository = RamPlayerRepository(storage_by_id, storage_by_username)
         repository.seen = self.seen.copy()
         return repository
 

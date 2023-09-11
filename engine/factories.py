@@ -1,8 +1,8 @@
-from typing import Literal
+from typing import Callable, List, Literal
 
 import di
 from adapters import repository
-from domain import commands
+from domain import commands, events
 from service_player import handlers, messagebus, unit_of_work
 
 
@@ -23,7 +23,7 @@ def create_repository(
         unit_of_work.AbstractRepository: Repository
     """
     if type == "ram":
-        return repository.RamRepository()
+        return repository.RamPlayerRepository()
 
     elif type == "sql":
         raise NotImplementedError
@@ -56,8 +56,8 @@ def create_uow(type: Literal["ram", "sql"]) -> unit_of_work.AbstractUnitOfWork:
 
 def create_message_bus(
     uow: unit_of_work.AbstractUnitOfWork,
-    event_handlers: dict[commands.Command, callable] = handlers.EVENT_HANDLERS,
-    command_handlers: dict[commands.Command, callable] = handlers.COMMAND_HANDLERS,
+    event_handlers: dict[events.Event, List[Callable]] = handlers.EVENT_HANDLERS,
+    command_handlers: dict[commands.Command, Callable] = handlers.COMMAND_HANDLERS,
 ) -> messagebus.MessageBus:
     """
     Create message bus
