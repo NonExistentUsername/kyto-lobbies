@@ -4,7 +4,7 @@ import abc
 from copy import deepcopy
 from typing import Generic, List, Optional, TypeVar
 
-from domain import players
+from domain import players, rooms
 from domain.base import BaseModel
 
 _T = TypeVar("_T", bound=BaseModel)
@@ -118,4 +118,14 @@ class RamPlayerRepository(RamRepository[players.Player]):
         storages: Optional[dict[str, dict[str, players.Player]]] = None,
     ):
         fields = fields or ["id", "username"]
+        super().__init__(fields, storages)
+
+
+class RamRoomRepository(RamRepository[rooms.Room]):
+    def __init__(
+        self,
+        fields: Optional[List[str]] = None,
+        storages: Optional[dict[str, dict[str, players.Player]]] = None,
+    ):
+        fields = fields or ["id", "creator_id"]
         super().__init__(fields, storages)
