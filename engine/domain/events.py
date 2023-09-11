@@ -9,3 +9,9 @@ class Event:
 class PlayerCreated(Event):
     id: str
     username: str
+
+
+@dataclass
+class RoomCreated(Event):
+    id: str
+    creator_id: str
