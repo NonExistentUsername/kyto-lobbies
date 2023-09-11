@@ -1,5 +1,4 @@
 import factories
-import pytest
 from domain import commands, players, rooms
 from service_player import exceptions, messagebus
 
@@ -18,9 +17,10 @@ class TestRoomCreation:
         message_bus.handle(commands.CreatePlayer(username="test"))
         player: players.Player = message_bus.uow.players.get(username="test")
 
-        command_result: commands.CommandResult = message_bus.handle(
+        future_result: messagebus.FutureResult = message_bus.handle(
             commands.CreateRoom(creator_id=player.id)
         )
+        command_result: commands.CommandResult = future_result.await_result()
         assert command_result is not None
         assert command_result.result is not None
         assert isinstance(command_result.result, rooms.Room)
@@ -29,24 +29,45 @@ class TestRoomCreation:
         assert message_bus.uow.rooms.get(creator_id=player.id) is not None
 
     def test_cannot_create_room_with_invalid_creator_id(self):
-        messagebus = bootstrap_test_message_bus()
+        message_bus = bootstrap_test_message_bus()
 
         player_id = "123"
-        with pytest.raises(exceptions.PlayerDoesNotExist):
-            messagebus.handle(commands.CreateRoom(creator_id=player_id))
+        future_result: messagebus.FutureResult = message_bus.handle(
+            commands.CreateRoom(creator_id=player_id)
+        )
+        command_result: commands.CommandResult = future_result.await_result()
 
-        assert len(messagebus.uow.rooms) == 0
-        assert messagebus.uow.rooms.get(creator_id=player_id) is None
+        assert command_result is not None
+        assert command_result.result is not None
+        assert isinstance(command_result.result, exceptions.PlayerDoesNotExist)
+
+        assert len(message_bus.uow.rooms) == 0
+        assert message_bus.uow.rooms.get(creator_id=player_id) is None
 
     def test_cannot_create_room_with_same_creator_id(self):
         message_bus = bootstrap_test_message_bus()
 
-        message_bus.handle(commands.CreatePlayer(username="test"))
+        future_result: messagebus.FutureResult = message_bus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        command_result: commands.CommandResult = future_result.await_result()
+        assert command_result is not None
+
         player: players.Player = message_bus.uow.players.get(username="test")
 
-        with pytest.raises(exceptions.RoomAlreadyExists):
-            message_bus.handle(commands.CreateRoom(creator_id=player.id))
-            message_bus.handle(commands.CreateRoom(creator_id=player.id))
+        message_bus.handle(commands.CreateRoom(creator_id=player.id))
+        future_result: messagebus.FutureResult = message_bus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        assert future_result.await_result() is not None
+
+        future_result: messagebus.FutureResult = message_bus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        command_result: commands.CommandResult = future_result.await_result()
+        assert command_result is not None
+        assert command_result.result is not None
+        assert isinstance(command_result.result, exceptions.RoomAlreadyExists)
 
         assert len(message_bus.uow.rooms) == 1
         assert message_bus.uow.rooms.get(creator_id=player.id) is not None
