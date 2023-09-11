@@ -26,13 +26,6 @@ async def create_player(
 
     It will create player with username
     It uses message bus to handle command and return response
-
-    Args:
-        username (str): Username of player
-        message_bus (Annotated[messagebus.MessageBus, Depends): Message bus
-
-    Returns:
-        Union[JSONResponse, Response]: Response object
     """
     try:
         command_result: commands.CommandResult = message_bus.handle(
