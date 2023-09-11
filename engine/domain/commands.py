@@ -1,8 +1,10 @@
 from dataclasses import dataclass
+from uuid import uuid4
 
 
 class Command:
-    pass
+    def __init__(self):
+        self.id: str = str(uuid4())  # unique id of command
 
 
 @dataclass
