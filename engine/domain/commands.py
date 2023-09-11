@@ -4,7 +4,11 @@ from uuid import uuid4
 
 class Command:
     def __init__(self):
-        self.id: str = str(uuid4())  # unique id of command
+        self.__id: str = str(uuid4())  # unique id of command
+
+    @property
+    def id(self) -> str:
+        return self.__id
 
 
 @dataclass

@@ -6,7 +6,11 @@ from domain import players, rooms
 
 class Event:
     def __init__(self):
-        self.id: str = str(uuid4())  # unique id of event
+        self.__id: str = str(uuid4())  # unique id of event
+
+    @property
+    def id(self) -> str:
+        return self.__id
 
 
 @dataclass
