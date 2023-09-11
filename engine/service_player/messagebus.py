@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import logging
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING, Any, Callable, Union
 
 from domain import commands, events
 from service_player import exceptions
@@ -18,14 +18,14 @@ class MessageBus:
     def __init__(
         self,
         uow: unit_of_work.AbstractUnitOfWork,
-        event_handlers: dict[events.Event, list[callable]],
-        command_handlers: dict[commands.Command, callable],
+        event_handlers: dict[events.Event, list[Callable]],
+        command_handlers: dict[commands.Command, Callable],
     ):
         self.uow: unit_of_work.AbstractUnitOfWork = uow
-        self.event_handlers: dict[events.Event, list[callable]] = event_handlers
-        self.command_handlers: dict[commands.Command, callable] = command_handlers
+        self.event_handlers: dict[events.Event, list[Callable]] = event_handlers
+        self.command_handlers: dict[commands.Command, Callable] = command_handlers
 
-    def handle(self, message: Message) -> None:
+    def handle(self, message: Message) -> commands.CommandResult | None:
         """
         Handle message
 
@@ -36,16 +36,21 @@ class MessageBus:
             ValueError: If message is not Event or Command
         """
         self.queue: list[Message] = [message]
+        result: commands.CommandResult | None = None
 
         while self.queue:
-            message: Message = self.queue.pop(0)
+            message = self.queue.pop(0)
 
             if isinstance(message, events.Event):
                 self._handle_event(message)
             elif isinstance(message, commands.Command):
-                self._handle_command(message)
+                command_execution_result = self._handle_command(message)
+                if result is None:
+                    result = commands.CommandResult(message, command_execution_result)
             else:
                 raise ValueError(f"{message} was not an Event or Command")
+
+        return result
 
     def _handle_event(self, event: events.Event) -> None:
         """
@@ -70,7 +75,7 @@ class MessageBus:
                 logger.exception(f"Exception handling event {event}")
                 continue
 
-    def _handle_command(self, command: commands.Command) -> None:
+    def _handle_command(self, command: commands.Command) -> Any:
         """
         Handle command
 
@@ -81,9 +86,11 @@ class MessageBus:
         try:
             handler = self.command_handlers[type(command)]  # Get handler
 
-            handler(command)  # Handle command
+            result = handler(command)  # Handle command
 
             self.queue.extend(self.uow.collect_new_events())  # Collect new events
+
+            return result  # Return command execution result
         except exceptions.InternalException as e:
             logger.warning(
                 f"Exception handling command {command}"
