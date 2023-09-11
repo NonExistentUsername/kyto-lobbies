@@ -1,4 +1,5 @@
 from entrypoints.fastapi_app.v1.players import router as players_router
+from entrypoints.fastapi_app.v1.rooms import router as rooms_router
 from fastapi import APIRouter
 
 """
@@ -11,3 +12,4 @@ router = APIRouter(
 )
 
 router.include_router(players_router)
+router.include_router(rooms_router)
