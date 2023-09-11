@@ -1,6 +1,6 @@
 import factories
 import pytest
-from domain import commands
+from domain import commands, players
 from service_player import exceptions, messagebus
 
 
@@ -15,7 +15,12 @@ class TestPlayerCreation:
     def test_create_player(self):  # sourcery skip: class-extract-method
         message_bus = bootstrap_test_message_bus()
 
-        message_bus.handle(commands.CreatePlayer(username="test"))
+        command_result: commands.CommandResult = message_bus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        assert command_result is not None
+        assert command_result.result is not None
+        assert isinstance(command_result.result, players.Player)
         assert message_bus.uow.players.get(username="test") is not None
 
     def test_cannot_create_player_with_same_username(self):
