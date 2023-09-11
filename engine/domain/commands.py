@@ -13,10 +13,9 @@ class Command:
 
 
 class CommandResult:
-    def __init__(self, command: Command, success: bool, result: Any = None):
+    def __init__(self, command: Command, result: Any = None):
         self.__id: str = str(uuid4())  # unique id of command response
         self.__command: Command = command  # command that was executed
-        self.__success: bool = success  # whether command was executed successfully
         self.__result: Any = result  # result of command execution
 
     @property
@@ -26,10 +25,6 @@ class CommandResult:
     @property
     def command(self) -> Command:
         return self.__command
-
-    @property
-    def success(self) -> bool:
-        return self.__success
 
     @property
     def result(self) -> Any:
