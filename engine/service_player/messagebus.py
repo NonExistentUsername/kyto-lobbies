@@ -29,8 +29,6 @@ class ResultDispatcher:  # Created for dispatching results to future results
         if result is None:
             return
 
-        print(f"Dispatching {result}")
-
         if isinstance(result, commands.CommandResult):
             self.__dispatch_command_result(result)
         else:
