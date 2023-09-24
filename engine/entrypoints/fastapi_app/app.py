@@ -4,7 +4,7 @@ from fastapi import FastAPI
 # but later we will use JWT and auth microservice
 
 
-def create_app() -> "FastAPI":
+def create_app() -> FastAPI:
     """
     Create FastAPI app
     Application will be created with all routers and exception handlers
