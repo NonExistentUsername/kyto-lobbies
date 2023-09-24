@@ -78,3 +78,115 @@ class TestRoomCreation:
 
         assert len(message_bus.uow.rooms) == 1
         assert message_bus.uow.rooms.get(creator_id=player.id) is not None
+
+    def test_join_room(self):
+        messagebus = bootstrap_test_message_bus()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test2")
+        )
+        another_player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id=another_player.id, room_id=room.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        assert async_result.ready()
+        assert room is not None
+        assert isinstance(room, rooms.Room)
+        assert len(room.players) == 2
+        assert room.players[1].id == another_player.id
+        assert room.players[1].username == another_player.username
+
+    def test_creator_already_joined_room(self):
+        messagebus = bootstrap_test_message_bus()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id=player.id, room_id=room.id)
+        )
+        with pytest.raises(exceptions.PlayerAlreadyInRoom):
+            async_result.get()
+
+    def test_join_room_with_same_player(self):
+        messagebus = bootstrap_test_message_bus()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test2")
+        )
+        another_player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id=another_player.id, room_id=room.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id=another_player.id, room_id=room.id)
+        )
+        with pytest.raises(exceptions.PlayerAlreadyInRoom):
+            async_result.get()
+
+    def test_join_room_with_invalid_player_id(self):
+        messagebus = bootstrap_test_message_bus()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        player: players.Player = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreateRoom(creator_id=player.id)
+        )
+        room: rooms.Room = async_result.get()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id="invalid", room_id=room.id)
+        )
+        with pytest.raises(exceptions.PlayerDoesNotExist):
+            async_result.get()
+
+    def test_join_room_with_invalid_room_id(self):
+        messagebus = bootstrap_test_message_bus()
+
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        player: players.Player = async_result.get()
+
+        room_id = "123"
+        async_result: multiprocessing.pool.ApplyResult = messagebus.handle(
+            commands.JoinRoom(player_id=player.id, room_id=room_id)
+        )
+        with pytest.raises(exceptions.RoomDoesNotExist):
+            async_result.get()

@@ -6,11 +6,11 @@ from domain.players import Player
 
 class Room(BaseModel):
     def __init__(
-        self, id: str, creator_id: str, players: Optional[List[Player]] = None
+        self, id: str, creator: Player, players: Optional[List[Player]] = None
     ):
         super().__init__(id)
-        self.__creator_id = creator_id
-        self.__players = players or []
+        self.__creator_id = creator.id
+        self.__players = players or [creator]
 
     @property
     def creator_id(self) -> str:

@@ -71,7 +71,7 @@ def create_room(
                 f"Room with creator id {command.creator_id} already exists"
             )
 
-        room = rooms.Room(id=str(uuid4()), creator_id=command.creator_id)
+        room = rooms.Room(id=str(uuid4()), creator=player)
         room.events.append(events.RoomCreated(room=room))
         uow.rooms.add(room)
         uow.commit()
