@@ -1,13 +1,15 @@
 import logging
 import multiprocessing.pool
-from typing import Annotated, Union
+from typing import Annotated, List, Union
 
 from domain import commands, rooms
 from entrypoints.fastapi_app.deps import get_message_bus
 from entrypoints.fastapi_app.responses import (
     ErrorResponse,
+    GetRoomResponse,
     InternalErrorResponse,
     Response,
+    Room,
 )
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
@@ -166,13 +168,16 @@ async def get_room(
             status_code=status.HTTP_404_NOT_FOUND,
         )
 
+    players: List[str] = [player.id for player in room.players]
+
     return JSONResponse(
-        content=Response(
+        content=GetRoomResponse(
             message="Room found",
-            data={
-                "id": room.id,
-                "creator_id": room.creator_id,
-            },
+            data=Room(
+                id=room.id,
+                creator_id=room.creator_id,
+                players=players,
+            ),
             status_code=status.HTTP_200_OK,
             success=True,
         ).model_dump(),

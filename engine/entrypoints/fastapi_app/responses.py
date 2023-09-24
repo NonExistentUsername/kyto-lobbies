@@ -1,4 +1,16 @@
+from typing import Any, Dict, List
+
 from pydantic import BaseModel
+
+
+class Room(BaseModel):
+    """
+    Room model
+    """
+
+    id: str
+    creator_id: str
+    players: List[str]
 
 
 class Response(BaseModel):
@@ -9,10 +21,10 @@ class Response(BaseModel):
     status_code: int  # Internal status code
     success: bool
     message: str
-    data: dict = {}
+    data: Dict[str, Any] = {}
 
 
-class ErrorResponse(BaseModel):
+class ErrorResponse(Response):
     """
     Basic response model
     """
@@ -20,15 +32,20 @@ class ErrorResponse(BaseModel):
     status_code: int  # Internal status code
     success: bool = False
     message: str
-    data: dict = {}
 
 
-class InternalErrorResponse(BaseModel):
+class InternalErrorResponse(ErrorResponse):
     """
     Basic response model
     """
 
     status_code: int = 500  # Internal status code
-    success: bool = False
     message: str = "Internal server error"
-    data: dict = {}
+
+
+class GetRoomResponse(Response):
+    """
+    Response model for get room
+    """
+
+    data: Room

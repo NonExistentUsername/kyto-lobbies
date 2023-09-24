@@ -135,3 +135,4 @@ def test_get_room():
     assert response["success"] is True
     assert response["data"]["id"] == room_id
     assert response["data"]["creator_id"] == creator_id
+    assert response["data"]["players"] == [creator_id]
