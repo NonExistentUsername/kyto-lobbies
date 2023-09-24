@@ -1,4 +1,5 @@
 import logging
+import multiprocessing.pool
 from typing import Annotated, Union
 
 from domain import commands, rooms
@@ -18,24 +19,19 @@ router = APIRouter(
 
 @router.post("/", response_model=Response, status_code=status.HTTP_201_CREATED)
 async def create_room(
-    player_id: str,
+    creator_id: str,
     message_bus: Annotated[messagebus.MessageBus, Depends(get_message_bus)],
 ) -> Union[JSONResponse, Response]:
     """
     Create room endpoint
 
-    It will create room with creator as player with player_id
+    It will create room with creator as player with creator_id
     """
     try:
-        future_result: messagebus.FutureResult = message_bus.handle(
-            commands.CreateRoom(creator_id=player_id)
+        async_result: multiprocessing.pool.AsyncResult = message_bus.handle(
+            commands.CreateRoom(creator_id=creator_id)
         )
-        command_result: commands.CommandResult = future_result.await_result()
-
-        if isinstance(command_result.result, Exception):
-            raise command_result.result
-
-        room: rooms.Room = command_result.result
+        room: rooms.Room = async_result.get()
 
         return JSONResponse(
             content=Response(
