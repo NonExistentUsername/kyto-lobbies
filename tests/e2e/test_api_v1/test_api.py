@@ -18,6 +18,7 @@ def test_create_player():
     assert_default_format(response)
 
     assert response["status_code"] == 400
+    assert response["success"] is False
 
     response = api_client.post_create_player(username="testuser")
 
@@ -27,11 +28,14 @@ def test_create_player():
     assert "id" in data
     assert "username" in data
     assert data["username"] == "testuser"
+    assert response["status_code"] == 201
+    assert response["success"] is True
 
     response = api_client.post_create_player(username="testuser")
     assert_default_format(response)
 
     assert response["status_code"] == 409
+    assert response["success"] is False
 
 
 def test_create_room():
@@ -44,6 +48,7 @@ def test_create_room():
     assert_default_format(response)
 
     assert response["status_code"] == 404
+    assert response["success"] is False
 
     response = api_client.post_create_room(creator_id=player_id)
 
@@ -52,8 +57,11 @@ def test_create_room():
 
     assert "id" in data
     assert "creator_id" in data
+    assert response["status_code"] == 201
+    assert response["success"] is True
 
     response = api_client.post_create_room(creator_id=player_id)
 
     assert_default_format(response)
     assert response["status_code"] == 409
+    assert response["success"] is False
