@@ -142,17 +142,20 @@ Defaults to None. If None, then message bus will run in main thread
         Raises:
             ValueError: If message is not Event or Command
         """
+        return self._handle_sync(message)
+
+    def _handle_sync(self, message: Message) -> Optional[FutureResult]:
         result = None
 
         if isinstance(message, commands.Command):
             result = FutureResult()
             self.result_dispatcher.add_listener(message.id, result.get_handler())
 
-        self._run_queue(message)
+        self._run_sync_queue(message)
 
         return result
 
-    def _run_queue(self, message: Message) -> None:
+    def _run_sync_queue(self, message: Message) -> None:
         queue = [message]  # Create queue with message
 
         while queue:  # While queue is not empty
