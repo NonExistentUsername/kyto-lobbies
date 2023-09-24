@@ -14,6 +14,11 @@ def assert_default_format(response):
 
 
 def test_create_player():
+    response = api_client.post_create_player(username="")
+    assert_default_format(response)
+
+    assert response["status_code"] == 400
+
     response = api_client.post_create_player(username="testuser")
 
     assert_default_format(response)
@@ -34,6 +39,11 @@ def test_create_room():
 
     assert_default_format(response)
     player_id = response["data"]["id"]
+
+    response = api_client.post_create_room(creator_id="")
+    assert_default_format(response)
+
+    assert response["status_code"] == 404
 
     response = api_client.post_create_room(creator_id=player_id)
 
