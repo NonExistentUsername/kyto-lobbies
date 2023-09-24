@@ -107,11 +107,32 @@ class MessageBus:
         uow: unit_of_work.AbstractUnitOfWork,
         event_handlers: dict[events.Event, list[Callable]],
         command_handlers: dict[commands.Command, Callable],
+        background_threads: Optional[int] = None,
     ):
+        """
+        Create message bus
+
+        Args:
+            uow (unit_of_work.AbstractUnitOfWork): Unit of work
+            event_handlers (dict[events.Event, list[Callable]]): Event handlers
+            command_handlers (dict[commands.Command, Callable]): Command handlers
+            background_threads (Optional[int], optional): \
+Number of background threads. \
+Defaults to None. If None, then message bus will run in main thread
+        """
         self.result_dispatcher = ResultDispatcher()
         self.uow: unit_of_work.AbstractUnitOfWork = uow
         self.event_handlers: dict[events.Event, list[Callable]] = event_handlers
         self.command_handlers: dict[commands.Command, Callable] = command_handlers
+
+        self.pool = None
+
+        if background_threads is not None:
+            import concurrent.futures
+
+            self.pool = concurrent.futures.ThreadPoolExecutor(
+                max_workers=background_threads
+            )
 
     def handle(self, message: Message) -> Optional[FutureResult]:
         """
@@ -176,3 +197,7 @@ class MessageBus:
         except Exception as e:
             logger.exception(f"Exception processing {func}")
             return e
+
+    def __del__(self):
+        if self.pool is not None:
+            self.pool.shutdown()
