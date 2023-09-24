@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import abc
 import logging
 from typing import TYPE_CHECKING, Any, Callable, Dict, List, Optional, Union
 
@@ -99,7 +100,22 @@ def result_converter_decorator(func: Callable) -> Callable:
     return wrapper
 
 
-class MessageBus:
+class IMessageBus:
+    @abc.abstractmethod
+    def handle(self, message: Message) -> Optional[FutureResult]:
+        """
+        Handle message
+
+        Args:
+            message (Message): Message to handle. It can be either Event or Command
+
+        Raises:
+            ValueError: If message is not Event or Command
+        """
+        raise NotImplementedError
+
+
+class MessageBus(IMessageBus):
     def __init__(
         self,
         uow: unit_of_work.AbstractUnitOfWork,
