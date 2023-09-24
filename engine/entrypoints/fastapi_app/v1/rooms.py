@@ -73,3 +73,75 @@ async def create_room(
             ).model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@router.post(
+    "/{room_id}/join",
+    response_model=Response,
+    status_code=status.HTTP_200_OK,
+)
+async def join_room(
+    room_id: str,
+    player_id: str,
+    message_bus: Annotated[messagebus.MessageBus, Depends(get_message_bus)],
+) -> Union[JSONResponse, Response]:
+    """
+    Join room endpoint
+
+    It will add player with player_id to room with room_id
+    """
+    try:
+        async_result: multiprocessing.pool.AsyncResult = message_bus.handle(
+            commands.JoinRoom(room_id=room_id, player_id=player_id)
+        )
+        room: rooms.Room = async_result.get()
+
+        return JSONResponse(
+            content=Response(
+                message="Player joined room",
+                data={
+                    "id": room.id,
+                    "creator_id": room.creator_id,
+                },
+                status_code=status.HTTP_200_OK,
+                success=True,
+            ).model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except exceptions.RoomDoesNotExist as e:
+        return JSONResponse(
+            content=Response(
+                message=str(e),
+                status_code=status.HTTP_404_NOT_FOUND,
+                success=False,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except exceptions.PlayerDoesNotExist as e:
+        return JSONResponse(
+            content=Response(
+                message=str(e),
+                status_code=status.HTTP_404_NOT_FOUND,
+                success=False,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except exceptions.PlayerAlreadyInRoom as e:
+        return JSONResponse(
+            content=Response(
+                message=str(e),
+                status_code=status.HTTP_409_CONFLICT,
+                success=False,
+            ).model_dump(),
+            status_code=status.HTTP_409_CONFLICT,
+        )
+    except Exception as e:
+        logger.exception(e)
+        return JSONResponse(
+            content=Response(
+                message="Internal server error",
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                success=False,
+            ).model_dump(),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

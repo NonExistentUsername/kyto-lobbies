@@ -11,3 +11,11 @@ class Player(BaseModel):
         super().__init__(id)
         self.username: str = username
         self.events: list[Event] = []
+
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Player):
+            return False
+        return self.id == other.id
+
+    def __hash__(self) -> int:
+        return hash(self.id)

@@ -20,3 +20,10 @@ def post_create_room(creator_id: str) -> Dict:
         f"{config.get_api_url()}/v1/rooms",
         params={"creator_id": creator_id},
     ).json()
+
+
+def join_room(room_id: str, player_id: str) -> Dict:
+    return _client.post(
+        f"{config.get_api_url()}/v1/rooms/{room_id}/join",
+        params={"player_id": player_id},
+    ).json()

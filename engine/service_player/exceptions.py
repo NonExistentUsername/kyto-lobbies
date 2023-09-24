@@ -16,3 +16,11 @@ class InvalidPlayerUsername(InternalException):
 
 class RoomAlreadyExists(InternalException):
     pass
+
+
+class RoomDoesNotExist(InternalException):
+    pass
+
+
+class PlayerAlreadyInRoom(InternalException):
+    pass

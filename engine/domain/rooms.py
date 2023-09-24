@@ -1,12 +1,12 @@
 from typing import List, Optional
 
-from domain import players as players
 from domain.base import BaseModel
+from domain.players import Player
 
 
 class Room(BaseModel):
     def __init__(
-        self, id: str, creator_id: str, players: Optional[List[players.Player]] = None
+        self, id: str, creator_id: str, players: Optional[List[Player]] = None
     ):
         super().__init__(id)
         self.__creator_id = creator_id
@@ -23,7 +23,7 @@ class Room(BaseModel):
         return self.__creator_id
 
     @property
-    def players(self) -> list[players.Player]:
+    def players(self) -> list[Player]:
         """
         Getter for players
 
@@ -31,3 +31,12 @@ class Room(BaseModel):
             list[Player]: players
         """
         return self.__players
+
+    def add_player(self, player: Player) -> None:
+        """
+        Add player to room
+
+        Args:
+            player (players.Player): Player to add
+        """
+        self.__players.append(player)

@@ -29,3 +29,14 @@ class RoomCreated(Event):
     def __init__(self, room: rooms.Room):
         super().__init__()
         self.room = room
+
+
+@dataclass
+class PlayerJoinedRoom(Event):
+    room: rooms.Room
+    player: players.Player
+
+    def __init__(self, room: rooms.Room, player: players.Player):
+        super().__init__()
+        self.room = room
+        self.player = player

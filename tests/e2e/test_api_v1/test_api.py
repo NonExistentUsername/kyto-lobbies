@@ -65,3 +65,54 @@ def test_create_room():
     assert_default_format(response)
     assert response["status_code"] == 409
     assert response["success"] is False
+
+
+def test_join_room():
+    response = api_client.post_create_player(username="testuser3")
+
+    assert_default_format(response)
+    creator_id = response["data"]["id"]
+
+    response = api_client.post_create_player(username="testuser4")
+
+    assert_default_format(response)
+    first_player_id = response["data"]["id"]
+
+    response = api_client.post_create_player(username="testuser5")
+
+    assert_default_format(response)
+    second_player_id = response["data"]["id"]
+
+    response = api_client.post_create_room(creator_id=creator_id)
+
+    assert_default_format(response)
+    room_id = response["data"]["id"]
+
+    response = api_client.join_room(room_id=room_id, player_id=first_player_id)
+
+    assert_default_format(response)
+    assert response["status_code"] == 200
+    assert response["success"] is True
+
+    response = api_client.join_room(room_id=room_id, player_id=second_player_id)
+
+    assert_default_format(response)
+    assert response["status_code"] == 200
+    assert response["success"] is True
+
+    response = api_client.join_room(room_id=room_id, player_id=second_player_id)
+
+    assert_default_format(response)
+    assert response["status_code"] == 409
+    assert response["success"] is False
+
+    response = api_client.join_room(room_id="invalid", player_id=second_player_id)
+
+    assert_default_format(response)
+    assert response["status_code"] == 404
+    assert response["success"] is False
+
+    response = api_client.join_room(room_id=room_id, player_id="invalid")
+
+    assert_default_format(response)
+    assert response["status_code"] == 404
