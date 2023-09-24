@@ -139,3 +139,42 @@ async def join_room(
             content=InternalErrorResponse().model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
+
+
+@router.get(
+    "/{room_id}",
+    response_model=Response,
+    status_code=status.HTTP_200_OK,
+)
+async def get_room(
+    room_id: str,
+    message_bus: Annotated[messagebus.MessageBus, Depends(get_message_bus)],
+) -> Union[JSONResponse, Response]:
+    """
+    Get room endpoint
+
+    It will return room with room_id
+    """
+    room: rooms.Room = message_bus.uow.rooms.get(id=room_id)
+
+    if room is None:
+        return JSONResponse(
+            content=ErrorResponse(
+                message="Room does not exist",
+                status_code=status.HTTP_404_NOT_FOUND,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+
+    return JSONResponse(
+        content=Response(
+            message="Room found",
+            data={
+                "id": room.id,
+                "creator_id": room.creator_id,
+            },
+            status_code=status.HTTP_200_OK,
+            success=True,
+        ).model_dump(),
+        status_code=status.HTTP_200_OK,
+    )

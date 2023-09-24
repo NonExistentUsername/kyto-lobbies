@@ -15,6 +15,12 @@ def post_create_player(username: str) -> Dict:
     ).json()
 
 
+def get_room(room_id: str) -> Dict:
+    return _client.get(
+        f"{config.get_api_url()}/v1/rooms/{room_id}",
+    ).json()
+
+
 def post_create_room(creator_id: str) -> Dict:
     return _client.post(
         f"{config.get_api_url()}/v1/rooms",

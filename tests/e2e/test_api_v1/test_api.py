@@ -116,3 +116,22 @@ def test_join_room():
 
     assert_default_format(response)
     assert response["status_code"] == 404
+
+
+def test_get_room():
+    response = api_client.post_create_player(username="testuser6")
+
+    assert_default_format(response)
+    creator_id = response["data"]["id"]
+
+    response = api_client.post_create_room(creator_id=creator_id)
+    assert_default_format(response)
+    room_id = response["data"]["id"]
+
+    response = api_client.get_room(room_id=room_id)
+    assert_default_format(response)
+
+    assert response["status_code"] == 200
+    assert response["success"] is True
+    assert response["data"]["id"] == room_id
+    assert response["data"]["creator_id"] == creator_id
