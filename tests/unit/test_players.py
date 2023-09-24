@@ -1,4 +1,7 @@
+import multiprocessing.pool
+
 import factories
+import pytest
 from domain import commands, players
 from service_player import exceptions, messagebus
 
@@ -14,45 +17,44 @@ class TestPlayerCreation:
     def test_create_player(self):  # sourcery skip: class-extract-method
         message_bus = bootstrap_test_message_bus()
 
-        future_result: messagebus.FutureResult = message_bus.handle(
+        async_result: multiprocessing.pool.ApplyResult = message_bus.handle(
             commands.CreatePlayer(username="test")
         )
-        command_result: commands.CommandResult = future_result.await_result()
+        player: players.Player = async_result.get()  # Wait for result
 
-        assert future_result is not None
-        assert future_result.result is not None
-
-        assert command_result is not None
-        assert command_result.result is not None
-        assert isinstance(command_result.result, players.Player)
+        assert async_result.ready()
+        assert player is not None
+        assert isinstance(player, players.Player)
+        assert player.id is not None
+        assert player.username == "test"
 
         assert message_bus.uow.players.get(username="test") is not None
 
     def test_cannot_create_player_with_same_username(self):
         message_bus = bootstrap_test_message_bus()
 
-        message_bus.handle(commands.CreatePlayer(username="test"))
-        assert message_bus.uow.players.get(username="test") is not None
-
-        future_result: messagebus.FutureResult = message_bus.handle(
+        async_result: multiprocessing.pool.ApplyResult = message_bus.handle(
             commands.CreatePlayer(username="test")
         )
-        command_result: commands.CommandResult = future_result.await_result()
+        async_result.get()  # Wait for result
 
-        assert command_result is not None
-        assert command_result.result is not None
-        assert isinstance(command_result.result, exceptions.PlayerAlreadyExists)
+        assert len(message_bus.uow.players) == 1
+        assert message_bus.uow.players.get(username="test") is not None
+
+        async_result: multiprocessing.pool.ApplyResult = message_bus.handle(
+            commands.CreatePlayer(username="test")
+        )
+        with pytest.raises(exceptions.PlayerAlreadyExists):
+            async_result.get()  # Wait for result
 
         assert len(message_bus.uow.players) == 1
 
     def test_cannot_create_player_with_empty_username(self):
         message_bus = bootstrap_test_message_bus()
 
-        future_result: messagebus.FutureResult = message_bus.handle(
+        async_result: multiprocessing.pool.ApplyResult = message_bus.handle(
             commands.CreatePlayer(username="")
         )
-        command_result: commands.CommandResult = future_result.await_result()
 
-        assert command_result is not None
-        assert command_result.result is not None
-        assert isinstance(command_result.result, exceptions.InvalidPlayerUsername)
+        with pytest.raises(exceptions.InvalidPlayerUsername):
+            async_result.get()  # Wait for result
