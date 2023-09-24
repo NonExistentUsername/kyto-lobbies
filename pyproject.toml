@@ -22,6 +22,7 @@ mypy = "^1.5.1"
 requests = "^2.31.0"
 types-requests = "^2.31.0.4"
 tenacity = "^8.2.3"
+httpx = "^0.25.0"
 
 [tool.ruff]
 select = ["E", "F", "B", "W"]
