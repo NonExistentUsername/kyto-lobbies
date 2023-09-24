@@ -4,7 +4,11 @@ from typing import Annotated, Union
 
 from domain import commands, rooms
 from entrypoints.fastapi_app.deps import get_message_bus
-from entrypoints.fastapi_app.responses import Response
+from entrypoints.fastapi_app.responses import (
+    ErrorResponse,
+    InternalErrorResponse,
+    Response,
+)
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from service_player import exceptions, messagebus
@@ -47,29 +51,26 @@ async def create_room(
         )
     except exceptions.RoomAlreadyExists as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_409_CONFLICT,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_409_CONFLICT,
         )
     except exceptions.PlayerDoesNotExist as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_404_NOT_FOUND,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_404_NOT_FOUND,
         )
     except Exception as e:
         logger.exception(e)
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message="Internal server error",
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
@@ -110,38 +111,31 @@ async def join_room(
         )
     except exceptions.RoomDoesNotExist as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_404_NOT_FOUND,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_404_NOT_FOUND,
         )
     except exceptions.PlayerDoesNotExist as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_404_NOT_FOUND,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_404_NOT_FOUND,
         )
     except exceptions.PlayerAlreadyInRoom as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_409_CONFLICT,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_409_CONFLICT,
         )
     except Exception as e:
         logger.exception(e)
         return JSONResponse(
-            content=Response(
-                message="Internal server error",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                success=False,
-            ).model_dump(),
+            content=InternalErrorResponse().model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )

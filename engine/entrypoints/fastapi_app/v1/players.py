@@ -4,7 +4,11 @@ from typing import Annotated, Union
 
 from domain import commands, players
 from entrypoints.fastapi_app.deps import get_message_bus
-from entrypoints.fastapi_app.responses import Response
+from entrypoints.fastapi_app.responses import (
+    ErrorResponse,
+    InternalErrorResponse,
+    Response,
+)
 from fastapi import APIRouter, Depends, status
 from fastapi.responses import JSONResponse
 from service_player import exceptions, messagebus
@@ -47,29 +51,23 @@ async def create_player(
         )
     except exceptions.PlayerAlreadyExists as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_409_CONFLICT,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_409_CONFLICT,
         )
     except exceptions.InvalidPlayerUsername as e:
         return JSONResponse(
-            content=Response(
+            content=ErrorResponse(
                 message=str(e),
                 status_code=status.HTTP_400_BAD_REQUEST,
-                success=False,
             ).model_dump(),
             status_code=status.HTTP_400_BAD_REQUEST,
         )
     except Exception as e:
         logger.exception(e)
         return JSONResponse(
-            content=Response(
-                message="Error during creating player",
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                success=False,
-            ).model_dump(),
+            content=InternalErrorResponse().model_dump(),
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
