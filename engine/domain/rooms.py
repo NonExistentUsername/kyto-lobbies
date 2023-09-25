@@ -32,7 +32,7 @@ class Room(BaseModel):
         """
         return self.__players
 
-    def add_player(self, player: Player) -> None:
+    def join(self, player: Player) -> None:
         """
         Add player to room
 

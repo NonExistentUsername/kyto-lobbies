@@ -108,7 +108,7 @@ def join_room(
 already in room with id {command.room_id}"
             )
 
-        room.add_player(player)
+        room.join(player)
 
         room.events.append(events.PlayerJoinedRoom(room=room, player=player))
         uow.commit()
