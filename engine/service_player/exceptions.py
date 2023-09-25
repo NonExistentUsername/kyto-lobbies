@@ -24,3 +24,7 @@ class RoomDoesNotExist(InternalException):
 
 class PlayerAlreadyInRoom(InternalException):
     pass
+
+
+class PlayerNotInRoom(InternalException):
+    pass

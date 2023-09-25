@@ -28,15 +28,24 @@ class Room(BaseModel):
         Getter for players
 
         Returns:
-            list[Player]: players
+            list[Player]: players currently in the room
         """
         return self.__players
 
     def join(self, player: Player) -> None:
         """
-        Add player to room
+        Add a player to the room.
 
         Args:
-            player (players.Player): Player to add
+            player (players.Player): The player to add to the room.
         """
         self.__players.append(player)
+
+    def leave(self, player: Player) -> None:
+        """
+        Remove player from room
+
+        Args:
+            player (players.Player): Player to remove from the room
+        """
+        self.__players.remove(player)

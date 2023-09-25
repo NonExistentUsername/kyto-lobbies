@@ -58,3 +58,14 @@ class JoinRoom(Command):
         super().__init__()
         self.room_id = room_id
         self.player_id = player_id
+
+
+@dataclass
+class LeaveRoom(Command):
+    room_id: str
+    player_id: str
+
+    def __init__(self, room_id: str, player_id: str):
+        super().__init__()
+        self.room_id = room_id
+        self.player_id = player_id

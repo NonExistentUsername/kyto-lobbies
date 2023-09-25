@@ -183,3 +183,68 @@ async def get_room(
         ).model_dump(),
         status_code=status.HTTP_200_OK,
     )
+
+
+@router.post(
+    "/{room_id}/leave",
+    response_model=Response,
+    status_code=status.HTTP_200_OK,
+)
+async def leave_room(
+    room_id: str,
+    player_id: str,
+    message_bus: Annotated[messagebus.MessageBus, Depends(get_message_bus)],
+) -> Union[JSONResponse, Response]:
+    """
+    Leave room endpoint
+
+    It will remove player with player_id from room with room_id
+    """
+    try:
+        async_result: multiprocessing.pool.AsyncResult = message_bus.handle(
+            commands.LeaveRoom(room_id=room_id, player_id=player_id)
+        )
+        room: rooms.Room = async_result.get()
+
+        return JSONResponse(
+            content=Response(
+                message="Player left room",
+                data={
+                    "id": room.id,
+                    "creator_id": room.creator_id,
+                },
+                status_code=status.HTTP_200_OK,
+                success=True,
+            ).model_dump(),
+            status_code=status.HTTP_200_OK,
+        )
+    except exceptions.RoomDoesNotExist as e:
+        return JSONResponse(
+            content=ErrorResponse(
+                message=str(e),
+                status_code=status.HTTP_404_NOT_FOUND,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except exceptions.PlayerDoesNotExist as e:
+        return JSONResponse(
+            content=ErrorResponse(
+                message=str(e),
+                status_code=status.HTTP_404_NOT_FOUND,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except exceptions.PlayerNotInRoom as e:
+        return JSONResponse(
+            content=ErrorResponse(
+                message=str(e),
+                status_code=status.HTTP_404_NOT_FOUND,
+            ).model_dump(),
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    except Exception as e:
+        logger.exception(e)
+        return JSONResponse(
+            content=InternalErrorResponse().model_dump(),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )

@@ -116,13 +116,52 @@ already in room with id {command.room_id}"
         return room
 
 
+def leave_room(
+    command: commands.LeaveRoom, uow: unit_of_work.AbstractUnitOfWork
+) -> rooms.Room:
+    """
+    Leave room
+
+    Args:
+        command (commands.LeaveRoom): Leave room command
+        uow (unit_of_work.AbstractUnitOfWork): Unit of work
+    """
+    with uow:
+        room: rooms.Room = uow.rooms.get(id=command.room_id)
+        if not room:
+            raise exceptions.RoomDoesNotExist(
+                f"Room with id {command.room_id} does not exist"
+            )
+
+        player: players.Player = uow.players.get(id=command.player_id)
+        if not player:
+            raise exceptions.PlayerDoesNotExist(
+                f"Player with id {command.player_id} does not exist"
+            )
+
+        if player not in room.players:
+            raise exceptions.PlayerNotInRoom(
+                f"Player with id {command.player_id} is not \
+in room with id {command.room_id}"
+            )
+
+        room.leave(player)
+
+        room.events.append(events.PlayerLeftRoom(room=room, player=player))
+        uow.commit()
+
+        return room
+
+
 EVENT_HANDLERS = {
     events.PlayerCreated: [player_created_event_handler],
     events.RoomCreated: [],
     events.PlayerJoinedRoom: [],
+    events.PlayerLeftRoom: [],
 }
 COMMAND_HANDLERS = {
     commands.CreatePlayer: create_player,
     commands.CreateRoom: create_room,
     commands.JoinRoom: join_room,
+    commands.LeaveRoom: leave_room,
 }

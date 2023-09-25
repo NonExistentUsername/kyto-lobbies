@@ -40,3 +40,14 @@ class PlayerJoinedRoom(Event):
         super().__init__()
         self.room = room
         self.player = player
+
+
+@dataclass
+class PlayerLeftRoom(Event):
+    room: rooms.Room
+    player: players.Player
+
+    def __init__(self, room: rooms.Room, player: players.Player):
+        super().__init__()
+        self.room = room
+        self.player = player
