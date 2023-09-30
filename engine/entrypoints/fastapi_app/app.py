@@ -1,8 +1,5 @@
 from fastapi import FastAPI
 
-# TODO: For first time, we will recieve uuid of player from client,
-# but later we will use JWT and auth microservice
-
 
 def create_app() -> FastAPI:
     """
