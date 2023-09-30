@@ -23,6 +23,7 @@ def create_app() -> FastAPI:
     app.include_router(api_v1_router)
 
     app.add_exception_handler(404, rewrite_404_exception)
+    app.add_exception_handler(500, rewrite_404_exception)
 
     return app
 
