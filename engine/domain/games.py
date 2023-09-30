@@ -1,13 +1,31 @@
-from typing import Any, Dict
+from dataclasses import dataclass
+from typing import Any, Dict, Union
 
 from domain.base import BaseModel
 
 
+@dataclass
+class WebhookHandlerDescription:
+    url: str
+
+
+@dataclass
+class RedisHandlerDescription:
+    pass
+
+
 class GameDescription(BaseModel):
-    def __init__(self, id: str, name: str, description: str):
+    def __init__(
+        self,
+        id: str,
+        name: str,
+        description: str,
+        handler_description: Union[WebhookHandlerDescription, RedisHandlerDescription],
+    ):
         super().__init__(id)
         self.__name = name
         self.__description = description
+        self.handler_description = handler_description
 
     @property
     def name(self) -> str:
