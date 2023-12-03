@@ -443,6 +443,20 @@ files = [
 ]
 
 [[package]]
+name = "kytool"
+version = "0.1.0"
+description = "Kytool is a tool for creatng"
+optional = false
+python-versions = ">=3.11,<4.0"
+files = [
+    {file = "kytool-0.1.0-py3-none-any.whl", hash = "sha256:2d8650a8eed14e552cba36fcbadc023cc61ee60a2d065f5b71dae0891533ae13"},
+]
+
+[package.source]
+type = "file"
+url = "kytool-0.1.0-py3-none-any.whl"
+
+[[package]]
 name = "mako"
 version = "1.2.4"
 description = "A super-fast templating language that borrows the best ideas from the existing templating languages."
@@ -1330,4 +1344,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "75247b6fae0194b05d55f048a63ea6dfda9a73e38e476275ac90a77154ef53d3"
+content-hash = "89b33983e6280c9a5ad7ed73c1f411c691ed44663bef243e699f3b380116d16a"

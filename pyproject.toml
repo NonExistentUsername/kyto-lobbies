@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "engine"
+name = "lobbies"
 version = "0.1.0"
-description = "Engine service"
+description = "Lobbies service"
 authors = ["Dmytro Maior <mayor4090@gmail.com>"]
 readme = "README.md"
 packages = [
@@ -23,6 +23,7 @@ requests = "^2.31.0"
 types-requests = "^2.31.0.4"
 tenacity = "^8.2.3"
 httpx = "^0.25.0"
+kytool = {path = "kytool-0.1.0-py3-none-any.whl"}
 
 [tool.ruff]
 select = ["E", "F", "B", "W"]
